@@ -1,87 +1,26 @@
 import React, { useRef, useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { ChevronLeft, ChevronRight, Tag, Copy, Check, Sparkles, Flame, Zap, Percent } from 'lucide-react';
+import { ChevronLeft, ChevronRight, Tag, Copy, Check } from 'lucide-react';
+import { type Offer, iconMap, mockOffers } from '../../data/offers';
 
-interface Offer {
-  id: string;
-  title: string;
-  discount: string;
-  code: string;
-  appliesTo: string;
-  description: string;
-  gradientClass: string;
-  accentColor: string;
-  glowClass: string;
-  icon: React.ReactNode;
-  image: string;
+interface PromoCarouselProps {
+  offers?: Offer[];
 }
 
-export const PromoCarousel: React.FC = () => {
+export const PromoCarousel: React.FC<PromoCarouselProps> = ({ offers = [] }) => {
   const containerRef = useRef<HTMLDivElement>(null);
   const [scrollWidth, setScrollWidth] = useState(0);
   const [currentScroll, setCurrentScroll] = useState(0);
   const [copiedId, setCopiedId] = useState<string | null>(null);
 
-  const offers: Offer[] = [
-    {
-      id: 'off-1',
-      title: 'VELOCITY KINETIC RUN',
-      discount: '30% OFF',
-      code: 'KINETIC30',
-      appliesTo: 'ALL RUNNING GEAR',
-      description: 'Supercharge your velocity. Maximize kinetic energy return with carbon-weave plates.',
-      gradientClass: 'from-[#10b981] to-teal-400',
-      accentColor: '#10b981',
-      glowClass: 'shadow-[#10b981]/20',
-      icon: <Zap className="w-4 h-4 text-[#10b981]" />,
-      image: 'https://images.unsplash.com/photo-1502224562085-639556652f33?q=80&w=800&auto=format&fit=crop'
-    },
-    {
-      id: 'off-2',
-      title: 'APEX CORE GYM UNIT',
-      discount: '₹1,500 OFF',
-      code: 'GYMPOWER15',
-      appliesTo: 'GYM EQUIPMENT ABOVE ₹4,000',
-      description: 'Elevate your core conditioning. Engineered cast steel plates and tactical dumbbells.',
-      gradientClass: 'from-purple-500 to-indigo-600',
-      accentColor: '#9d4edd',
-      glowClass: 'shadow-purple-500/20',
-      icon: <Flame className="w-4 h-4 text-purple-400" />,
-      image: 'https://images.unsplash.com/photo-1517838277536-f5f99be501cd?q=80&w=800&auto=format&fit=crop'
-    },
-    {
-      id: 'off-3',
-      title: 'CHAMPIONS FIELD DROP',
-      discount: '25% OFF',
-      code: 'CHAMP25',
-      appliesTo: 'FOOTBALL & CRICKET SPECIAL',
-      description: 'Claim your victory. Handcrafted English willow blade and composite thermo-bonded skins.',
-      gradientClass: 'from-rose-500 to-orange-500',
-      accentColor: '#f43f5e',
-      glowClass: 'shadow-rose-500/20',
-      icon: <Sparkles className="w-4 h-4 text-rose-400" />,
-      image: 'https://images.unsplash.com/photo-1508098682722-e99c43a406b2?q=80&w=800&auto=format&fit=crop'
-    },
-    {
-      id: 'off-4',
-      title: 'ZEN YOGA COOLDOWN',
-      discount: 'FREE SLEEVE',
-      code: 'ZENFLOW',
-      appliesTo: 'WITH ANY HELIX PRO YOGA MAT',
-      description: 'Restore your physical sync. High-density alignment mats and recovery accessories.',
-      gradientClass: 'from-cyan-400 to-blue-500',
-      accentColor: '#00f2fe',
-      glowClass: 'shadow-cyan-400/20',
-      icon: <Percent className="w-4 h-4 text-cyan-400" />,
-      image: 'https://images.unsplash.com/photo-1544367567-0f2fcb009e0b?q=80&w=800&auto=format&fit=crop'
-    }
-  ];
+  // Fallback to static mockOffers if prop is empty
+  const activeOffers = offers.length > 0 ? offers.filter(o => o.active !== false) : mockOffers;
 
   useEffect(() => {
     if (containerRef.current) {
       setScrollWidth(containerRef.current.scrollWidth - containerRef.current.offsetWidth);
     }
-  }, []);
+  }, [activeOffers]);
 
   const scroll = (direction: 'left' | 'right') => {
     if (containerRef.current) {
@@ -168,8 +107,9 @@ export const PromoCarousel: React.FC = () => {
         className="w-full flex overflow-x-auto scrollbar-none space-x-6 pb-6 pt-2 snap-x snap-mandatory"
         style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}
       >
-        {offers.map((offer) => {
+        {activeOffers.map((offer) => {
           const isCopied = copiedId === offer.id;
+          const activeIcon = iconMap[offer.iconName] || <Tag className="w-4 h-4 text-amber-400" />;
           return (
             <div 
               key={offer.id} 
@@ -205,7 +145,7 @@ export const PromoCarousel: React.FC = () => {
 
                   {/* Right HUD floating badge */}
                   <div className="absolute top-4 right-5 z-20 w-8 h-8 rounded-lg bg-[#030712]/85 backdrop-blur-xs border border-white/10 flex items-center justify-center shadow-sm">
-                    {offer.icon}
+                    {activeIcon}
                   </div>
 
                   {/* Bottom Text Overlays */}
@@ -288,3 +228,4 @@ export const PromoCarousel: React.FC = () => {
     </div>
   );
 };
+

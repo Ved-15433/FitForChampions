@@ -9,6 +9,9 @@ import { PromoCarousel } from './components/ui/PromoCarousel';
 import { ProductCard } from './components/ui/ProductCard';
 import type { Product } from './components/ui/ProductCard';
 import { mockProducts } from './data/products';
+import { mockOffers, type Offer } from './data/offers';
+import { supabase, isSupabaseConfigured } from './services/supabaseClient';
+import { AdminDashboard } from './components/admin/AdminDashboard';
 import { 
   Zap, 
   Activity, 
@@ -17,14 +20,50 @@ import {
   Sliders, 
   LayoutGrid, 
   Compass, 
-  Target
+  Target,
+  Lock,
+  Loader2,
+  Sparkles
 } from 'lucide-react';
 
 function App() {
+  const [products, setProducts] = useState<Product[]>([]);
+  const [offers, setOffers] = useState<Offer[]>([]);
+  const [orders, setOrders] = useState<any[]>([]);
   const [cartItems, setCartItems] = useState<CartItem[]>([]);
   const [isCartOpen, setIsCartOpen] = useState(false);
   const [selectedCategory, setSelectedCategory] = useState<string>('All');
   const [mousePos, setMousePos] = useState({ x: 0, y: 0 });
+  const [isAdminPath, setIsAdminPath] = useState<boolean>(window.location.pathname === '/admin');
+  const [isAdminAuthenticated, setIsAdminAuthenticated] = useState<boolean>(false);
+  const [adminEmail, setAdminEmail] = useState<string>('');
+  const [authLoading, setAuthLoading] = useState<boolean>(false);
+
+  // Login Form States
+  const [loginEmail, setLoginEmail] = useState('');
+  const [loginPassword, setLoginPassword] = useState('');
+
+  // Handle URL path changes for SPA routing
+  useEffect(() => {
+    const handleLocationChange = () => {
+      setIsAdminPath(window.location.pathname === '/admin');
+    };
+    window.addEventListener('popstate', handleLocationChange);
+    
+    // Check if auth session exists
+    const checkSession = async () => {
+      if (isSupabaseConfigured) {
+        const { data: { session } } = await supabase.auth.getSession();
+        if (session?.user) {
+          setIsAdminAuthenticated(true);
+          setAdminEmail(session.user.email || 'admin@champions.com');
+        }
+      }
+    };
+    checkSession();
+
+    return () => window.removeEventListener('popstate', handleLocationChange);
+  }, []);
 
   // Handle cursor glow movement
   useEffect(() => {
@@ -34,6 +73,142 @@ function App() {
     window.addEventListener('mousemove', handleMouseMove);
     return () => window.removeEventListener('mousemove', handleMouseMove);
   }, []);
+
+  // Fetch db data
+  const fetchProducts = async () => {
+    if (isSupabaseConfigured) {
+      try {
+        const { data } = await supabase.from('products').select('*').order('created_at', { ascending: false });
+        if (data && data.length > 0) {
+          const mapped: Product[] = data.map(p => ({
+            id: p.id,
+            name: p.title,
+            description: p.description,
+            price: p.price,
+            rating: p.rating || 4.8,
+            category: p.category || 'Running',
+            image: p.image || 'https://images.unsplash.com/photo-1542291026-7eec264c27ff',
+            stockCount: p.stock ?? 0,
+            specs: p.specifications || [],
+            isNewArrival: !!p.new_arrival
+          }));
+          setProducts(mapped);
+        } else {
+          setProducts(mockProducts);
+        }
+      } catch (err) {
+        setProducts(mockProducts);
+      }
+    } else {
+      setProducts(mockProducts);
+    }
+  };
+
+  const fetchOffers = async () => {
+    if (isSupabaseConfigured) {
+      try {
+        const { data } = await supabase.from('offers').select('*').order('created_at', { ascending: false });
+        if (data && data.length > 0) {
+          const mapped: Offer[] = data.map(o => ({
+            id: o.id,
+            title: o.title,
+            description: o.description,
+            discount: o.offer_value,
+            code: o.coupon_code,
+            appliesTo: o.appliesTo || 'ALL SECTORS',
+            gradientClass: o.gradientClass || 'from-[#10b981] to-teal-400',
+            accentColor: o.accentColor || '#10b981',
+            glowClass: o.glowClass || 'shadow-[#10b981]/20',
+            iconName: o.iconName || 'Zap',
+            image: o.banner_image || 'https://images.unsplash.com/photo-1544367567-0f2fcb009e0b',
+            active: o.active
+          }));
+          setOffers(mapped);
+        } else {
+          setOffers(mockOffers);
+        }
+      } catch (err) {
+        setOffers(mockOffers);
+      }
+    } else {
+      setOffers(mockOffers);
+    }
+  };
+
+  const fetchOrders = async () => {
+    if (isSupabaseConfigured) {
+      try {
+        const { data } = await supabase.from('orders').select('*').order('created_at', { ascending: false });
+        if (data) {
+          setOrders(data);
+        }
+      } catch (err) {
+        console.warn('Orders selective fetch failed:', err);
+      }
+    }
+  };
+
+  // Sync databases and hook Realtime subscriptions
+  useEffect(() => {
+    fetchProducts();
+    fetchOffers();
+    fetchOrders();
+
+    if (isSupabaseConfigured) {
+      const channel = supabase
+        .channel('public-db-sync')
+        .on('postgres_changes', { event: '*', schema: 'public', table: 'products' }, () => {
+          fetchProducts();
+        })
+        .on('postgres_changes', { event: '*', schema: 'public', table: 'offers' }, () => {
+          fetchOffers();
+        })
+        .on('postgres_changes', { event: '*', schema: 'public', table: 'orders' }, () => {
+          fetchOrders();
+        })
+        .subscribe();
+
+      return () => {
+        supabase.removeChannel(channel);
+      };
+    }
+  }, []);
+
+  // Login handler
+  const handleLoginSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setAuthLoading(true);
+
+    if (isSupabaseConfigured) {
+      const { data, error } = await supabase.auth.signInWithPassword({
+        email: loginEmail,
+        password: loginPassword
+      });
+      if (error) {
+        alert('Authentication Denied: ' + error.message);
+      } else if (data?.user) {
+        setIsAdminAuthenticated(true);
+        setAdminEmail(data.user.email || 'admin@champions.com');
+      }
+    } else {
+      // Local passcode gate
+      if (loginEmail === 'admin@champions.com' && loginPassword === 'champions') {
+        setIsAdminAuthenticated(true);
+        setAdminEmail('admin@champions.com');
+      } else {
+        alert('Access Denied! Standard passcode fallback: admin@champions.com / champions');
+      }
+    }
+    setAuthLoading(false);
+  };
+
+  const handleLogout = async () => {
+    if (isSupabaseConfigured) {
+      await supabase.auth.signOut();
+    }
+    setIsAdminAuthenticated(false);
+    setAdminEmail('');
+  };
 
   const handleAddToCart = (product: Product) => {
     setCartItems((prevItems) => {
@@ -47,7 +222,6 @@ function App() {
       }
       return [...prevItems, { product, quantity: 1 }];
     });
-    // Open cart drawer automatically for visual confirmation
     setIsCartOpen(true);
   };
 
@@ -69,20 +243,60 @@ function App() {
     setCartItems((prevItems) => prevItems.filter((item) => item.product.id !== productId));
   };
 
-  const handleCheckout = () => {
-    alert('SECURE LINK INITIATED: Synced checkout terminal simulation. Purchase mock-authorized!');
-    setCartItems([]);
-    setIsCartOpen(false);
+  // Checkout order placement log mutation
+  const handleCheckout = async () => {
+    const customerName = prompt('Enter Recipient Name:', 'Anoop Sharma') || 'Guest Athlete';
+    const phone = prompt('Enter Phone Number:', '+91 98765 43210') || '+91 99999 99999';
+
+    const totalAmount = cartItems.reduce((acc, item) => acc + item.product.price * item.quantity, 0);
+    
+    const newOrderPayload = {
+      customer_name: customerName,
+      phone: phone,
+      products: cartItems.map(item => ({
+        product: { id: item.product.id, name: item.product.name, price: item.product.price },
+        quantity: item.quantity
+      })),
+      total_amount: totalAmount,
+      payment_method: 'UPI Cyberpay',
+      status: 'pending'
+    };
+
+    if (isSupabaseConfigured) {
+      const { error } = await supabase.from('orders').insert([newOrderPayload]);
+      if (error) {
+        alert('Checkout sync failed: ' + error.message);
+      } else {
+        alert('ORDER SECURED! Syncing dispatcher database.');
+        setCartItems([]);
+        setIsCartOpen(false);
+      }
+    } else {
+      alert('SIMULATED CHECKOUT AUTHORIZED! Mock order logged in active logs.');
+      setOrders(prev => [
+        {
+          id: 'ord-' + Math.floor(Math.random() * 100000),
+          customer_name: customerName,
+          phone: phone,
+          products: newOrderPayload.products,
+          total_amount: totalAmount,
+          status: 'pending',
+          created_at: new Date().toISOString()
+        },
+        ...prev
+      ]);
+      setCartItems([]);
+      setIsCartOpen(false);
+    }
   };
 
   const filteredProducts =
     selectedCategory === 'All'
-      ? mockProducts
-      : mockProducts.filter((product) => product.category === selectedCategory);
+      ? products
+      : products.filter((product) => product.category === selectedCategory);
 
   const cartCount = cartItems.reduce((acc, item) => acc + item.quantity, 0);
 
-  // Custom configuration for categories, matching requested ones + icons
   const categories = [
     { name: 'All', icon: <LayoutGrid className="w-5 h-5" />, color: 'from-neon-cyan to-neon-blue', textGlow: 'glow-text-cyan' },
     { name: 'Gym Equipment', icon: <Dumbbell className="w-5 h-5" />, color: 'from-neon-purple to-indigo-600', textGlow: 'glow-text-purple' },
@@ -93,7 +307,6 @@ function App() {
     { name: 'Yoga', icon: <Activity className="w-5 h-5" />, color: 'from-pink-500 to-rose-500', textGlow: 'glow-text-purple' },
   ];
 
-  // Scroll to shop helper
   const scrollToShop = () => {
     const shopEl = document.getElementById('shop');
     if (shopEl) {
@@ -101,8 +314,114 @@ function App() {
     }
   };
 
+  // -------------------------------------------------------------
+  // ADMIN DASHBOARD SCREEN ROUTER RENDERING
+  // -------------------------------------------------------------
+  if (isAdminPath) {
+    if (!isAdminAuthenticated) {
+      return (
+        <div className="min-h-screen bg-[#030712] text-slate-100 flex items-center justify-center p-6 relative select-none selection:bg-amber-500/20 selection:text-amber-400 overflow-hidden">
+          {/* Cyber Background overlay layer */}
+          <CyberGrid />
+
+          <div className="absolute inset-0 bg-[radial-gradient(circle_500px_at_50%_40%,#1e1b4b,transparent)] pointer-events-none opacity-60" />
+
+          {/* Secure Login glassmorphic card container */}
+          <div className="relative w-full max-w-md p-8 rounded-2xl glass-panel border border-white/5 bg-slate-950/80 shadow-2xl relative z-10 overflow-hidden">
+            
+            {/* Ambient orange light behind lock */}
+            <div className="absolute top-0 left-1/2 -translate-x-1/2 w-32 h-20 bg-amber-500/10 rounded-full blur-2xl pointer-events-none" />
+
+            <div className="text-center mb-8 flex flex-col items-center">
+              <div className="w-12 h-12 rounded-xl border border-amber-500/20 bg-amber-500/5 flex items-center justify-center mb-4">
+                <Lock className="w-5 h-5 text-amber-500 animate-pulse" />
+              </div>
+              <h1 className="font-orbitron font-extrabold text-lg text-white uppercase tracking-widest">
+                MAINFRAME LOCK
+              </h1>
+              <p className="font-space text-[10px] text-slate-500 mt-1.5 tracking-widest uppercase">
+                Champions Admin portal authorization
+              </p>
+            </div>
+
+            <form onSubmit={handleLoginSubmit} className="space-y-5 font-space text-xs">
+              
+              {/* Email */}
+              <div className="space-y-2">
+                <label className="text-slate-400 font-bold uppercase tracking-wider block text-[9px]">CONSOLE SECURE USERNAME</label>
+                <input 
+                  type="email" 
+                  required
+                  placeholder="admin@champions.com"
+                  value={loginEmail}
+                  onChange={(e) => setLoginEmail(e.target.value)}
+                  className="w-full bg-slate-900 border border-white/5 focus:border-amber-400/40 rounded-xl px-4 py-3 text-white focus:outline-hidden placeholder-slate-600"
+                />
+              </div>
+
+              {/* Password */}
+              <div className="space-y-2">
+                <label className="text-slate-400 font-bold uppercase tracking-wider block text-[9px]">CONSOLE PASSCODE ACCESS</label>
+                <input 
+                  type="password" 
+                  required
+                  placeholder="••••••••"
+                  value={loginPassword}
+                  onChange={(e) => setLoginPassword(e.target.value)}
+                  className="w-full bg-slate-900 border border-white/5 focus:border-amber-400/40 rounded-xl px-4 py-3 text-white focus:outline-hidden"
+                />
+              </div>
+
+              <div className="pt-2">
+                <button
+                  type="submit"
+                  disabled={authLoading}
+                  className="w-full flex items-center justify-center space-x-2 px-4 py-3 bg-linear-to-r from-amber-500 to-orange-500 hover:shadow-lg hover:shadow-orange-500/10 text-slate-950 font-orbitron font-black text-xs uppercase tracking-widest rounded-xl transition-all duration-300 cursor-pointer shadow-md"
+                >
+                  {authLoading ? (
+                    <>
+                      <Loader2 className="w-4.5 h-4.5 animate-spin text-slate-950" />
+                      <span>DECRYPTING KEYS...</span>
+                    </>
+                  ) : (
+                    <>
+                      <Sparkles className="w-4.5 h-4.5 text-slate-950" />
+                      <span>SECURE LOG IN</span>
+                    </>
+                  )}
+                </button>
+              </div>
+
+              {/* Graceful tip warning */}
+              <div className="p-3 bg-slate-900/50 border border-white/5 rounded-xl text-slate-500 text-[10px] leading-relaxed text-center">
+                Local offline access: Use <code className="text-amber-500 font-bold">admin@champions.com</code> with passcode <code className="text-amber-500 font-bold">champions</code>.
+              </div>
+
+            </form>
+          </div>
+        </div>
+      );
+    }
+
+    return (
+      <AdminDashboard 
+        products={products}
+        offers={offers}
+        orders={orders}
+        onRefreshProducts={fetchProducts}
+        onRefreshOffers={fetchOffers}
+        onRefreshOrders={fetchOrders}
+        onLogout={handleLogout}
+        userEmail={adminEmail}
+      />
+    );
+  }
+
+  // -------------------------------------------------------------
+  // STOREFRONT PUBLIC SCREEN RENDERING
+  // -------------------------------------------------------------
   return (
-    <div className="relative min-h-screen selection:bg-neon-cyan/30 select-none pb-12">
+    <div className="relative min-h-screen selection:bg-[#10b981]/30 select-none pb-12 overflow-x-hidden">
       
       {/* Moving 3D Grid + Particles background (ThreeJS Canvas layer) */}
       <CyberGrid />
@@ -180,13 +499,13 @@ function App() {
               <span className="text-teal-400">●</span>
               <span>ZERO LIMITS // FUTURE ATHLETICS</span>
               <span className="text-[#10b981]">●</span>
-              </span>
+            </span>
           ))}
         </div>
       </section>
 
       {/* Cybernetic Promo Carousel for Ongoing Campaigns & Discounts */}
-      <PromoCarousel />
+      <PromoCarousel offers={offers} />
 
       {/* Interactive Categories Section */}
       <section id="categories" className="relative z-10 max-w-7xl mx-auto px-6 py-12 scroll-mt-24">
@@ -213,15 +532,13 @@ function App() {
                 className={`relative flex flex-col items-center justify-center p-5 w-28 h-28 rounded-2xl border transition-all duration-500 cursor-pointer group ${
                   isActive 
                     ? `bg-[#0a1c12] border-[#10b981]/50 text-white shadow-lg shadow-[#10b981]/25 scale-105` 
-                    : 'glass-panel border-white/5 text-slate-300 hover:border-[#10b981]/30 hover:scale-102 hover:shadow-md'
+                    : 'glass-panel border-white/5 text-slate-350 hover:border-[#10b981]/30 hover:scale-102 hover:shadow-md'
                 }`}
               >
-                {/* Glowing neon ring behind active icon */}
                 {isActive && (
                   <div className="absolute inset-0 rounded-2xl bg-linear-to-br from-[#10b981] to-teal-400 opacity-15 animate-pulse" />
                 )}
                 
-                {/* Rotating / Scaling Icon wrapper */}
                 <div className={`p-2.5 rounded-xl transition-all duration-500 ${
                   isActive 
                     ? 'bg-linear-to-r from-[#10b981] to-teal-400 text-slate-950' 
@@ -244,7 +561,7 @@ function App() {
       {/* New Arrivals Carousel Section */}
       <section className="relative z-10 max-w-7xl mx-auto px-6 pt-16 pb-8">
         <Carousel 
-          products={mockProducts.filter(p => p.isNewArrival && p.stockCount > 0)} 
+          products={products.filter(p => p.isNewArrival && p.stockCount > 0)} 
           onAddToCart={handleAddToCart}
           title="NEW ARRIVALS INBOUND"
           subtitle="⚡ Real-Time Drops Sector"
@@ -257,7 +574,7 @@ function App() {
 
       {/* Featured Products Carousel Section */}
       <section className="relative z-10 max-w-7xl mx-auto px-6 py-12">
-        <Carousel products={mockProducts.filter(p => p.stockCount > 0)} onAddToCart={handleAddToCart} />
+        <Carousel products={products.filter(p => p.stockCount > 0)} onAddToCart={handleAddToCart} />
       </section>
 
       {/* Product Catalog Showcase Section */}
