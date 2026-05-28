@@ -5,6 +5,7 @@ import { Footer } from './components/layout/Footer';
 import { CartDrawer } from './components/cart/CartDrawer';
 import type { CartItem } from './components/cart/CartDrawer';
 import { Carousel } from './components/ui/Carousel';
+import { PromoCarousel } from './components/ui/PromoCarousel';
 import { ProductCard } from './components/ui/ProductCard';
 import type { Product } from './components/ui/ProductCard';
 import { mockProducts } from './data/products';
@@ -179,10 +180,13 @@ function App() {
               <span className="text-teal-400">●</span>
               <span>ZERO LIMITS // FUTURE ATHLETICS</span>
               <span className="text-[#10b981]">●</span>
-            </span>
+              </span>
           ))}
         </div>
       </section>
+
+      {/* Cybernetic Promo Carousel for Ongoing Campaigns & Discounts */}
+      <PromoCarousel />
 
       {/* Interactive Categories Section */}
       <section id="categories" className="relative z-10 max-w-7xl mx-auto px-6 py-12 scroll-mt-24">
