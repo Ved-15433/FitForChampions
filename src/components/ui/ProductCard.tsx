@@ -56,6 +56,9 @@ export const ProductCard: React.FC<ProductCardProps> = ({ product, onAddToCart }
       className="relative flex flex-col h-full rounded-2xl glass-card border-neon-hover p-5 cursor-pointer select-none group"
       onMouseMove={handleMouseMove}
       onMouseLeave={handleMouseLeave}
+      onClick={() => {
+        if (isAvailable) onAddToCart(product);
+      }}
       style={{ transformStyle: 'preserve-3d' }}
     >
       {/* Shine lighting reflection layer */}
@@ -168,7 +171,7 @@ export const ProductCard: React.FC<ProductCardProps> = ({ product, onAddToCart }
           }`}
         >
           <ShoppingCart className="w-3.5 h-3.5" />
-          <span>{isAvailable ? 'BUY NOW' : 'LOCKED'}</span>
+          <span>{isAvailable ? 'ADD TO CART' : 'LOCKED'}</span>
         </button>
       </div>
     </div>

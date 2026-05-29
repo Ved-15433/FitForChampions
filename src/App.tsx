@@ -121,7 +121,9 @@ function App() {
             glowClass: o.glowClass || 'shadow-[#10b981]/20',
             iconName: o.iconName || 'Zap',
             image: o.banner_image || 'https://images.unsplash.com/photo-1544367567-0f2fcb009e0b',
-            active: o.active
+            active: o.active,
+            terms_conditions: o.terms_conditions,
+            expiry_date: o.expiry_date
           }));
           setOffers(mapped);
         } else {
@@ -244,13 +246,24 @@ function App() {
   };
 
   // Checkout order placement log mutation
-  const handleCheckout = async () => {
-    const customerName = prompt('Enter Recipient Name:', 'Anoop Sharma') || 'Guest Athlete';
-    const phone = prompt('Enter Phone Number:', '+91 98765 43210') || '+91 99999 99999';
+  const handleCheckout = async (
+    discountAmount: number = 0,
+    appliedCouponCode?: string,
+    address?: {
+      fullName: string;
+      contactNumber: string;
+      completeAddress: string;
+      pinCode: string;
+    }
+  ) => {
+    const customerName = address?.fullName || 'Guest Athlete';
+    const phone = address?.contactNumber || '+91 99999 99999';
 
-    const totalAmount = cartItems.reduce((acc, item) => acc + item.product.price * item.quantity, 0);
+    const subtotal = cartItems.reduce((acc, item) => acc + item.product.price * item.quantity, 0);
+    const shipping = subtotal > 1999 ? 0 : 150;
+    const totalAmount = Math.max(0, subtotal + shipping - discountAmount);
     
-    const newOrderPayload = {
+    const newOrderPayload: any = {
       customer_name: customerName,
       phone: phone,
       products: cartItems.map(item => ({
@@ -258,12 +271,46 @@ function App() {
         quantity: item.quantity
       })),
       total_amount: totalAmount,
+      discount_amount: discountAmount,
+      applied_coupon: appliedCouponCode || null,
+      complete_address: address?.completeAddress || null,
+      pin_code: address?.pinCode || null,
       payment_method: 'UPI Cyberpay',
       status: 'pending'
     };
 
     if (isSupabaseConfigured) {
-      const { error } = await supabase.from('orders').insert([newOrderPayload]);
+      let { error } = await supabase.from('orders').insert([newOrderPayload]);
+      
+      // Fallback: If DB does not contain the new schema columns (complete_address, pin_code, discount_amount, applied_coupon)
+      if (error && error.message && error.message.toLowerCase().includes('column') && error.message.toLowerCase().includes('does not exist')) {
+        console.warn('Supabase schema does not have the custom coupon/address columns. Retrying with metadata in products/payment_method.');
+        
+        const fallbackPayload = {
+          customer_name: customerName,
+          phone: phone,
+          products: [
+            ...cartItems.map(item => ({
+              product: { id: item.product.id, name: item.product.name, price: item.product.price },
+              quantity: item.quantity
+            })),
+            {
+              is_metadata: true,
+              complete_address: address?.completeAddress || null,
+              pin_code: address?.pinCode || null,
+              discount_amount: discountAmount,
+              applied_coupon: appliedCouponCode || null
+            } as any
+          ],
+          total_amount: totalAmount,
+          payment_method: `UPI Cyberpay | Address: ${address?.completeAddress || 'N/A'}, PIN: ${address?.pinCode || 'N/A'}, Coupon: ${appliedCouponCode || 'None'}, Discount: ₹${discountAmount}`,
+          status: 'pending'
+        };
+        
+        const retryResult = await supabase.from('orders').insert([fallbackPayload]);
+        error = retryResult.error;
+      }
+
       if (error) {
         alert('Checkout sync failed: ' + error.message);
       } else {
@@ -280,6 +327,10 @@ function App() {
           phone: phone,
           products: newOrderPayload.products,
           total_amount: totalAmount,
+          discount_amount: discountAmount,
+          applied_coupon: appliedCouponCode || null,
+          complete_address: address?.completeAddress || null,
+          pin_code: address?.pinCode || null,
           status: 'pending',
           created_at: new Date().toISOString()
         },
@@ -626,6 +677,7 @@ function App() {
         onUpdateQuantity={handleUpdateQuantity}
         onRemoveItem={handleRemoveItem}
         onCheckout={handleCheckout}
+        offers={offers}
       />
 
       {/* Cybernetic Footer */}
