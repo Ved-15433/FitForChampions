@@ -13,14 +13,14 @@ import { mockOffers, type Offer } from './data/offers';
 import { supabase, isSupabaseConfigured } from './services/supabaseClient';
 import { AdminDashboard } from './components/admin/AdminDashboard';
 import { FloatingCallButton } from './components/ui/FloatingCallButton';
-import { 
-  Zap, 
-  Activity, 
-  Flame, 
-  Dumbbell, 
-  Sliders, 
-  LayoutGrid, 
-  Compass, 
+import {
+  Zap,
+  Activity,
+  Flame,
+  Dumbbell,
+  Sliders,
+  LayoutGrid,
+  Compass,
   Target,
   Lock,
   Loader2,
@@ -50,7 +50,7 @@ function App() {
       setIsAdminPath(window.location.pathname === '/admin');
     };
     window.addEventListener('popstate', handleLocationChange);
-    
+
     // Check if auth session exists
     const checkSession = async () => {
       if (isSupabaseConfigured) {
@@ -263,7 +263,7 @@ function App() {
     const subtotal = cartItems.reduce((acc, item) => acc + item.product.price * item.quantity, 0);
     const shipping = subtotal > 1999 ? 0 : 150;
     const totalAmount = Math.max(0, subtotal + shipping - discountAmount);
-    
+
     const newOrderPayload: any = {
       customer_name: customerName,
       phone: phone,
@@ -282,7 +282,7 @@ function App() {
 
     // Format WhatsApp message
     const lineItems = cartItems.map(item => `● ${item.product.name} x${item.quantity} (₹${(item.product.price * item.quantity).toLocaleString('en-IN')})`).join('\n');
-    
+
     const waMessage = `🏆 FITFORCHAMPIONS - NEW ORDER 🏆\n\n` +
       `👤 CUSTOMER DETAILS:\n` +
       `-------------------\n` +
@@ -290,26 +290,25 @@ function App() {
       `● Contact: ${phone}\n` +
       `● Address: ${address?.completeAddress || 'N/A'}\n` +
       `● PIN Code: ${address?.pinCode || 'N/A'}\n\n` +
-      `🛒 ORDERED ROSTER:\n` +
+      `🛒 ORDERED SUMMARY:\n` +
       `-------------------\n` +
       `${lineItems}\n\n` +
-      `💰 BILLING REFORMS:\n` +
+      `💰 BILLING INVOICE:\n` +
       `-------------------\n` +
       `● Subtotal: ₹${subtotal.toLocaleString('en-IN')}\n` +
       `● Delivery: ${shipping === 0 ? 'FREE' : `₹${shipping}`}\n` +
       (discountAmount > 0 ? `● Coupon Discount (${appliedCouponCode || 'Coupon'}): - ₹${discountAmount.toLocaleString('en-IN')}\n` : '') +
-      `● TOTAL INVESTMENT: ₹${totalAmount.toLocaleString('en-IN')}\n\n` +
-      `⚡ Dispatching database sync authorized! ⚡`;
+      `● TOTAL BILL: ₹${totalAmount.toLocaleString('en-IN')}\n\n`;
 
     const waUrl = `https://wa.me/919579722268?text=${encodeURIComponent(waMessage)}`;
 
     if (isSupabaseConfigured) {
       let { error } = await supabase.from('orders').insert([newOrderPayload]);
-      
+
       // Fallback: If DB does not contain the new schema columns (complete_address, pin_code, discount_amount, applied_coupon)
       if (error && error.message && error.message.toLowerCase().includes('column') && error.message.toLowerCase().includes('does not exist')) {
         console.warn('Supabase schema does not have the custom coupon/address columns. Retrying with metadata in products/payment_method.');
-        
+
         const fallbackPayload = {
           customer_name: customerName,
           phone: phone,
@@ -330,7 +329,7 @@ function App() {
           payment_method: `UPI Cyberpay | Address: ${address?.completeAddress || 'N/A'}, PIN: ${address?.pinCode || 'N/A'}, Coupon: ${appliedCouponCode || 'None'}, Discount: ₹${discountAmount}`,
           status: 'pending'
         };
-        
+
         const retryResult = await supabase.from('orders').insert([fallbackPayload]);
         error = retryResult.error;
       }
@@ -406,7 +405,7 @@ function App() {
 
             {/* Secure Login glassmorphic card container */}
             <div className="relative w-full max-w-md p-8 rounded-2xl glass-panel border border-white/5 bg-slate-950/80 shadow-2xl relative z-10 overflow-hidden">
-              
+
               {/* Ambient orange light behind lock */}
               <div className="absolute top-0 left-1/2 -translate-x-1/2 w-32 h-20 bg-amber-500/10 rounded-full blur-2xl pointer-events-none" />
 
@@ -423,12 +422,12 @@ function App() {
               </div>
 
               <form onSubmit={handleLoginSubmit} className="space-y-5 font-space text-xs">
-                
+
                 {/* Email */}
                 <div className="space-y-2">
                   <label className="text-slate-400 font-bold uppercase tracking-wider block text-[9px]">CONSOLE SECURE USERNAME</label>
-                  <input 
-                    type="email" 
+                  <input
+                    type="email"
                     required
                     placeholder="admin@champions.com"
                     value={loginEmail}
@@ -440,8 +439,8 @@ function App() {
                 {/* Password */}
                 <div className="space-y-2">
                   <label className="text-slate-400 font-bold uppercase tracking-wider block text-[9px]">CONSOLE PASSCODE ACCESS</label>
-                  <input 
-                    type="password" 
+                  <input
+                    type="password"
                     required
                     placeholder="••••••••"
                     value={loginPassword}
@@ -485,7 +484,7 @@ function App() {
 
     return (
       <>
-        <AdminDashboard 
+        <AdminDashboard
           products={products}
           offers={offers}
           orders={orders}
@@ -505,17 +504,17 @@ function App() {
   // -------------------------------------------------------------
   return (
     <div className="relative min-h-screen selection:bg-[#10b981]/30 select-none pb-12 overflow-x-hidden">
-      
+
       {/* Moving 3D Grid + Particles background (ThreeJS Canvas layer) */}
       <CyberGrid />
 
       {/* Floating active Cursor Glow overlay */}
-      <div 
-        className="cursor-glow hidden md:block" 
-        style={{ 
-          left: `${mousePos.x}px`, 
-          top: `${mousePos.y}px` 
-        }} 
+      <div
+        className="cursor-glow hidden md:block"
+        style={{
+          left: `${mousePos.x}px`,
+          top: `${mousePos.y}px`
+        }}
       />
 
       {/* Translucent Glass Navbar */}
@@ -523,7 +522,7 @@ function App() {
 
       {/* Hero Section */}
       <header id="home" className="relative pt-44 pb-20 px-6 max-w-5xl mx-auto z-10 flex flex-col items-center text-center justify-center min-h-[85vh]">
-        
+
         {/* Tilted Brand Badge */}
         <div className="inline-flex items-center justify-center px-5 py-2.5 bg-[#091510] border border-[#10b981]/30 rounded-xs transform -skew-x-12 shadow-[0_0_20px_rgba(16,185,129,0.08)] mb-8">
           <div className="transform skew-x-12 flex items-center space-x-2">
@@ -552,14 +551,14 @@ function App() {
 
         {/* Action Buttons */}
         <div className="flex flex-wrap justify-center gap-6">
-          <button 
+          <button
             onClick={scrollToShop}
             className="relative px-8 py-4 bg-[#0a0f0d] text-white font-serif font-bold text-xs tracking-wider uppercase border border-[#10b981]/40 rounded-sm hover:border-[#10b981] hover:scale-[1.02] active:scale-[0.98] shadow-[0_0_15px_rgba(16,185,129,0.15)] transition-all duration-300 cursor-pointer"
           >
             <span>🛍️ SHOP NOW</span>
           </button>
-          
-          <button 
+
+          <button
             onClick={() => {
               const catEl = document.getElementById('categories');
               if (catEl) catEl.scrollIntoView({ behavior: 'smooth' });
@@ -612,27 +611,24 @@ function App() {
               <button
                 key={cat.name}
                 onClick={() => setSelectedCategory(cat.name)}
-                className={`relative flex flex-col items-center justify-center p-5 w-28 h-28 rounded-2xl border transition-all duration-500 cursor-pointer group ${
-                  isActive 
-                    ? `bg-[#0a1c12] border-[#10b981]/50 text-white shadow-lg shadow-[#10b981]/25 scale-105` 
+                className={`relative flex flex-col items-center justify-center p-5 w-28 h-28 rounded-2xl border transition-all duration-500 cursor-pointer group ${isActive
+                    ? `bg-[#0a1c12] border-[#10b981]/50 text-white shadow-lg shadow-[#10b981]/25 scale-105`
                     : 'glass-panel border-white/5 text-slate-350 hover:border-[#10b981]/30 hover:scale-102 hover:shadow-md'
-                }`}
+                  }`}
               >
                 {isActive && (
                   <div className="absolute inset-0 rounded-2xl bg-linear-to-br from-[#10b981] to-teal-400 opacity-15 animate-pulse" />
                 )}
-                
-                <div className={`p-2.5 rounded-xl transition-all duration-500 ${
-                  isActive 
-                    ? 'bg-linear-to-r from-[#10b981] to-teal-400 text-slate-950' 
+
+                <div className={`p-2.5 rounded-xl transition-all duration-500 ${isActive
+                    ? 'bg-linear-to-r from-[#10b981] to-teal-400 text-slate-950'
                     : 'bg-slate-900/60 text-slate-400 group-hover:bg-[#10b981]/10 group-hover:text-[#10b981] group-hover:rotate-12'
-                }`}>
+                  }`}>
                   {cat.icon}
                 </div>
 
-                <span className={`font-space text-[10px] font-bold uppercase tracking-wider mt-3.5 ${
-                  isActive ? 'text-white' : 'text-slate-400 group-hover:text-slate-200'
-                }`}>
+                <span className={`font-space text-[10px] font-bold uppercase tracking-wider mt-3.5 ${isActive ? 'text-white' : 'text-slate-400 group-hover:text-slate-200'
+                  }`}>
                   {cat.name.split(' ')[0]}
                 </span>
               </button>
@@ -643,8 +639,8 @@ function App() {
 
       {/* New Arrivals Carousel Section */}
       <section className="relative z-10 max-w-7xl mx-auto px-6 pt-16 pb-8">
-        <Carousel 
-          products={products.filter(p => p.isNewArrival && p.stockCount > 0)} 
+        <Carousel
+          products={products.filter(p => p.isNewArrival && p.stockCount > 0)}
           onAddToCart={handleAddToCart}
           title="NEW ARRIVALS INBOUND"
           subtitle="⚡ Real-Time Drops Sector"
@@ -662,7 +658,7 @@ function App() {
 
       {/* Product Catalog Showcase Section */}
       <section id="shop" className="relative z-10 max-w-7xl mx-auto px-6 py-16 scroll-mt-24">
-        
+
         {/* Section Header */}
         <div className="flex flex-col md:flex-row md:items-end justify-between mb-10 border-b border-white/10 pb-6">
           <div>
@@ -673,7 +669,7 @@ function App() {
               STORE INVENTORY
             </h2>
           </div>
-          
+
           <div className="flex items-center space-x-2 mt-4 md:mt-0 font-space text-xs text-slate-400 font-medium">
             <Sliders className="w-4 h-4 text-[#10b981]" />
             <span>Showing {filteredProducts.length} accessories in {selectedCategory}</span>
@@ -690,8 +686,8 @@ function App() {
         ) : (
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
             {filteredProducts.map((product) => (
-              <div 
-                key={product.id} 
+              <div
+                key={product.id}
                 className="h-full animate-in fade-in slide-in-from-bottom-6 duration-700 fill-mode-both"
               >
                 <ProductCard product={product} onAddToCart={handleAddToCart} />
@@ -702,7 +698,7 @@ function App() {
       </section>
 
       {/* Translucent sliding Cart Drawer */}
-      <CartDrawer 
+      <CartDrawer
         isOpen={isCartOpen}
         onClose={() => setIsCartOpen(false)}
         cartItems={cartItems}

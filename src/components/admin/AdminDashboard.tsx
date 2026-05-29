@@ -1,26 +1,26 @@
 import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { 
-  LayoutDashboard, 
-  ShoppingBag, 
-  Tag, 
-  Sparkles, 
-  Boxes, 
-  ClipboardList, 
-  Settings, 
-  LogOut, 
-  Plus, 
-  Search, 
-  Trash2, 
-  Edit, 
-  Activity, 
-  TrendingUp, 
-  CheckCircle, 
-  Clock, 
-  Loader2, 
-  X, 
-  Lock, 
-  Eye, 
+import {
+  LayoutDashboard,
+  ShoppingBag,
+  Tag,
+  Sparkles,
+  Boxes,
+  ClipboardList,
+  Settings,
+  LogOut,
+  Plus,
+  Search,
+  Trash2,
+  Edit,
+  Activity,
+  TrendingUp,
+  CheckCircle,
+  Clock,
+  Loader2,
+  X,
+  Lock,
+  Eye,
   AlertTriangle,
   Sun,
   Moon
@@ -55,7 +55,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
   const [searchQuery, setSearchQuery] = useState<string>('');
   const [categoryFilter, setCategoryFilter] = useState<string>('All');
   const [sortBy, setSortBy] = useState<string>('name-asc');
-  
+
   // Theme Toggle State
   const [theme, setTheme] = useState<'light' | 'dark'>(() => {
     if (typeof window !== 'undefined') {
@@ -78,7 +78,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
   const toggleTheme = () => {
     setTheme(prev => (prev === 'light' ? 'dark' : 'light'));
   };
-  
+
   // Modals / Editors State
   const [isProductModalOpen, setIsProductModalOpen] = useState(false);
   const [editingProduct, setEditingProduct] = useState<Product | null>(null);
@@ -225,7 +225,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
       const base64 = reader.result as string;
       setImagePreview(base64);
       setUploadProgress(100);
-      
+
       if (type === 'product') {
         setProductForm(prev => ({ ...prev, image: base64 }));
       } else {
@@ -240,7 +240,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
         const fileExt = file.name.split('.').pop();
         const fileName = `${Math.random()}.${fileExt}`;
         const bucket = type === 'product' ? 'product-assets' : 'offer-banners';
-        
+
         // Upload to bucket
         const { data, error } = await supabase.storage
           .from(bucket)
@@ -409,7 +409,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
   // Delete Product
   const handleDeleteProduct = async (id: string) => {
     if (!confirm('Are you absolutely sure you want to delete this product?')) return;
-    
+
     if (isSupabaseConfigured) {
       try {
         const { error } = await supabase
@@ -430,7 +430,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
   // Delete Offer
   const handleDeleteOffer = async (id: string) => {
     if (!confirm('Are you absolutely sure you want to delete this promotional offer?')) return;
-    
+
     if (isSupabaseConfigured) {
       try {
         const { error } = await supabase
@@ -451,7 +451,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
   // Toggle Offer Active Status
   const handleToggleOfferActive = async (offer: Offer) => {
     const nextStatus = offer.active === false ? true : false;
-    
+
     if (isSupabaseConfigured) {
       try {
         const { error } = await supabase
@@ -472,7 +472,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
   // Toggle Product Featured
   const handleToggleProductNewArrival = async (product: Product) => {
     const nextStatus = !product.isNewArrival;
-    
+
     if (isSupabaseConfigured) {
       try {
         const { error } = await supabase
@@ -493,7 +493,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
   // Update Order Status
   const handleUpdateOrderStatus = async (orderId: string, currentStatus: string) => {
     const nextStatus = currentStatus === 'pending' ? 'shipping' : currentStatus === 'shipping' ? 'delivered' : 'pending';
-    
+
     if (isSupabaseConfigured) {
       try {
         const { error } = await supabase
@@ -514,8 +514,8 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
   // Filter and Sort Products
   const filteredProducts = products
     .filter(p => {
-      const matchSearch = p.name.toLowerCase().includes(searchQuery.toLowerCase()) || 
-                          p.description.toLowerCase().includes(searchQuery.toLowerCase());
+      const matchSearch = p.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        p.description.toLowerCase().includes(searchQuery.toLowerCase());
       const matchCategory = categoryFilter === 'All' || p.category === categoryFilter;
       return matchSearch && matchCategory;
     })
@@ -531,16 +531,16 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
 
   return (
     <div className="min-h-screen bg-[#030712] text-slate-100 flex flex-col md:flex-row relative selection:bg-amber-500/20 selection:text-amber-400 select-none overflow-x-hidden">
-      
+
       {/* Background Animated Cyber grid pattern */}
       <div className="absolute inset-0 bg-[radial-gradient(circle_800px_at_100%_200px,#1e1b4b,transparent)] pointer-events-none opacity-50" />
       <div className="absolute inset-0 bg-[linear-gradient(to_right,#1f293708_1px,transparent_1px),linear-gradient(to_bottom,#1f293708_1px,transparent_1px)] bg-[size:24px_24px] pointer-events-none" />
 
       {/* Cyber Sidebar Console */}
-      <aside className="w-full md:w-64 border-r border-white/5 bg-slate-950/60 backdrop-blur-xl flex flex-col justify-between shrink-0 z-20">
+      <aside className="w-full md:w-64 border-r border-white/5 bg-gray-300 backdrop-blur-xl flex flex-col justify-between shrink-0 z-20">
         <div>
           {/* Logo Brand Title */}
-          <div className="p-6 border-b border-white/5 flex items-center space-x-3 bg-slate-950/30">
+          <div className="p-6 border-b border-white/5 flex items-center space-x-3 bg-gray-300">
             <div className="w-8 h-8 rounded-lg bg-linear-to-br from-amber-500 to-orange-500 flex items-center justify-center shadow-lg shadow-orange-500/20">
               <Boxes className="w-4 h-4 text-slate-950" />
             </div>
@@ -557,7 +557,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
           {/* User badge */}
           <div className="p-4 mx-4 my-4 rounded-xl bg-slate-900/40 border border-white/5 flex items-center space-x-3">
             <div className="w-8 h-8 rounded-full bg-slate-950 border border-white/10 flex items-center justify-center font-orbitron text-xs text-amber-400 font-black">
-              {userEmail.substring(0,2).toUpperCase()}
+              {userEmail.substring(0, 2).toUpperCase()}
             </div>
             <div className="overflow-hidden">
               <span className="font-space text-[10px] text-slate-400 truncate block">SYSTEM_ADMIN</span>
@@ -581,11 +581,10 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
                 <button
                   key={tab.id}
                   onClick={() => setActiveTab(tab.id)}
-                  className={`w-full flex items-center space-x-3 px-4 py-3 rounded-xl font-space text-xs font-semibold uppercase tracking-wider transition-all duration-300 cursor-pointer ${
-                    isActive 
-                      ? 'bg-amber-500/10 text-amber-400 border border-amber-500/20 shadow-xs shadow-amber-500/5'
-                      : 'text-slate-400 border border-transparent hover:text-slate-200 hover:bg-slate-900/30'
-                  }`}
+                  className={`w-full flex items-center space-x-3 px-4 py-3 rounded-xl font-space text-xs font-semibold uppercase tracking-wider transition-all duration-300 cursor-pointer ${isActive
+                    ? 'bg-amber-500/10 text-amber-400 border border-amber-500/20 shadow-xs shadow-amber-500/5'
+                    : 'text-slate-400 border border-transparent hover:text-slate-200 hover:bg-slate-900/30'
+                    }`}
                 >
                   {tab.icon}
                   <span>{tab.name}</span>
@@ -596,8 +595,8 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
         </div>
 
         {/* Console Log Out */}
-        <div className="p-4 border-t border-white/5 bg-slate-950/20">
-          <button 
+        <div className="p-4 border-t border-white/5 bg-grey-300">
+          <button
             onClick={onLogout}
             className="w-full flex items-center justify-center space-x-2 px-4 py-3 rounded-xl border border-rose-500/20 bg-rose-500/5 text-rose-400 hover:bg-rose-500/10 transition-all duration-300 font-space text-xs font-bold uppercase tracking-wider cursor-pointer"
           >
@@ -609,7 +608,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
 
       {/* Main Mainframe View */}
       <main className="flex-1 p-6 md:p-8 overflow-y-auto max-h-screen relative z-10">
-        
+
         {/* Connection status diagnostics */}
         <div className="flex items-center justify-between mb-8 pb-4 border-b border-white/5">
           <div>
@@ -623,7 +622,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
 
           <div className="flex items-center space-x-3">
             {/* Theme Toggle Button */}
-            <button 
+            <button
               onClick={toggleTheme}
               title="Switch Theme"
               className="p-2.5 rounded-xl border border-white/10 hover:border-emerald-500/50 hover:bg-emerald-500/5 transition-all duration-300 cursor-pointer group flex items-center justify-center text-slate-300 hover:text-emerald-400"
@@ -636,7 +635,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
             </button>
 
             {/* Connection status diagnostics */}
-            <div className="flex items-center space-x-2 bg-slate-950/60 border border-white/5 rounded-xl px-4 py-2 text-xs font-space">
+            <div className="flex items-center space-x-2 bg-gray-300 border border-white/5 rounded-xl px-4 py-2 text-xs font-space">
               <div className={`w-2 h-2 rounded-full animate-ping ${isSupabaseConfigured ? 'bg-[#10b981]' : 'bg-amber-500'}`} />
               <span className="text-slate-400 font-bold uppercase tracking-widest text-[9px]">
                 {isSupabaseConfigured ? 'CLOUDSYNC: SECURE' : 'LOCALSEED FALLBACK'}
@@ -658,7 +657,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
             {/* 1. DASHBOARD HOME VIEW */}
             {activeTab === 'dashboard' && (
               <div className="space-y-6">
-                
+
                 {/* 5 Diagnostic Stat Cards */}
                 <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-5">
                   {[
@@ -668,8 +667,8 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
                     { title: 'Critical Stock Alerts', value: lowStockCount, icon: <AlertTriangle className="w-5 h-5 text-rose-500" />, label: 'Units count <= 5', border: 'border-rose-500/10', warning: lowStockCount > 0 },
                     { title: 'Active Campaigns', value: activeOffersCount, icon: <Tag className="w-5 h-5 text-cyan-400" />, label: 'Coupons on storefront', border: 'border-cyan-500/10' }
                   ].map((card, idx) => (
-                    <div 
-                      key={idx} 
+                    <div
+                      key={idx}
                       className={`glass-panel p-5 rounded-2xl border ${card.border} hover:border-white/10 transition-all duration-300 relative group overflow-hidden`}
                     >
                       <div className="absolute top-0 right-0 w-24 h-24 bg-white/1 opacity-[0.02] rounded-bl-full pointer-events-none group-hover:scale-110 duration-500" />
@@ -677,7 +676,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
                         <span className="font-space text-[10px] text-slate-400 font-bold uppercase tracking-wider">
                           {card.title}
                         </span>
-                        <div className="p-2 rounded-xl bg-slate-950/60 border border-white/5">
+                        <div className="p-2 rounded-xl bg-gray-300 border border-white/5">
                           {card.icon}
                         </div>
                       </div>
@@ -693,7 +692,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
 
                 {/* Cyber charts row */}
                 <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-                  
+
                   {/* Top Selling Products chart component */}
                   <TopSellingChart orders={orders} products={products} />
 
@@ -702,7 +701,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
                     <span className="font-space text-[10px] text-slate-400 font-bold uppercase tracking-widest block mb-4">
                       Realtime Mainframe Activity
                     </span>
-                    
+
                     <div className="space-y-4 max-h-[195px] overflow-y-auto pr-1">
                       {[
                         { text: 'Sys-Admin logged in secure session', time: 'Just now', icon: <CheckCircle className="w-3.5 h-3.5 text-emerald-400" /> },
@@ -729,14 +728,14 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
             {/* 2. PRODUCT DIRECTORY VIEW */}
             {activeTab === 'products' && (
               <div className="space-y-6">
-                
+
                 {/* Search & filters tools row */}
-                <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 bg-slate-950/40 p-4 border border-white/5 rounded-2xl">
+                <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 bg-gray-300 p-4 border border-white/5 rounded-2xl">
                   <div className="flex flex-wrap items-center gap-3 flex-1">
                     {/* Search Field */}
                     <div className="relative w-full md:w-64">
                       <Search className="w-4 h-4 text-slate-500 absolute top-1/2 left-3.5 -translate-y-1/2" />
-                      <input 
+                      <input
                         type="text"
                         placeholder="Search roster catalog..."
                         value={searchQuery}
@@ -794,7 +793,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
                   <div className="overflow-x-auto w-full">
                     <table className="w-full text-left border-collapse">
                       <thead>
-                        <tr className="bg-slate-950/80 border-b border-white/5 text-[9px] font-space text-slate-400 uppercase tracking-widest">
+                        <tr className="bg-gray-300 border-b border-white/5 text-[9px] font-space text-slate-400 uppercase tracking-widest">
                           <th className="p-5 font-bold">Product</th>
                           <th className="p-5 font-bold">Category</th>
                           <th className="p-5 font-bold">Price</th>
@@ -884,9 +883,9 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
             {/* 3. OFFERS MANAGEMENT VIEW */}
             {activeTab === 'offers' && (
               <div className="space-y-6">
-                
+
                 {/* Header controls row */}
-                <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 bg-slate-950/40 p-4 border border-white/5 rounded-2xl">
+                <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 bg-gray-300 p-4 border border-white/5 rounded-2xl">
                   <div>
                     <span className="font-space text-xs font-bold text-amber-500 uppercase tracking-widest block">
                       Campaign Dashboard
@@ -918,8 +917,8 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
                     offers.map((offer) => {
                       const isActive = offer.active !== false;
                       return (
-                        <div 
-                          key={offer.id} 
+                        <div
+                          key={offer.id}
                           className="glass-panel p-5 rounded-2xl border border-white/5 hover:border-white/10 transition-all duration-300 flex flex-col justify-between relative group"
                         >
                           <div className="flex items-start justify-between mb-4">
@@ -938,11 +937,10 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
                             {/* Active Toggle Status */}
                             <button
                               onClick={() => handleToggleOfferActive(offer)}
-                              className={`px-3 py-1.5 rounded-full font-space text-[9px] font-bold uppercase tracking-widest transition-all duration-300 cursor-pointer border ${
-                                isActive 
-                                  ? 'bg-emerald-500/10 border-emerald-500/20 text-[#10b981]' 
-                                  : 'bg-rose-500/10 border-rose-500/20 text-rose-400'
-                              }`}
+                              className={`px-3 py-1.5 rounded-full font-space text-[9px] font-bold uppercase tracking-widest transition-all duration-300 cursor-pointer border ${isActive
+                                ? 'bg-emerald-500/10 border-emerald-500/20 text-[#10b981]'
+                                : 'bg-rose-500/10 border-rose-500/20 text-rose-400'
+                                }`}
                             >
                               {isActive ? 'ACTIVE' : 'DEACTIVATED'}
                             </button>
@@ -987,9 +985,9 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
             {/* 4. FEATURED & NEW ARRIVALS PANELS */}
             {activeTab === 'featured' && (
               <div className="space-y-6">
-                
+
                 {/* Header context info */}
-                <div className="bg-slate-950/40 p-5 border border-white/5 rounded-2xl">
+                <div className="bg-gray-300 p-5 border border-white/5 rounded-2xl">
                   <span className="font-space text-xs font-bold text-amber-500 uppercase tracking-widest block">
                     Catalog Focus priority
                   </span>
@@ -1003,7 +1001,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
 
                 {/* Dynamic listings workspace */}
                 <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-                  
+
                   {/* New arrivals manager table list */}
                   <div className="glass-panel p-6 rounded-2xl border border-white/5 relative">
                     <div className="flex items-center justify-between mb-4 border-b border-white/5 pb-3">
@@ -1079,9 +1077,9 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
             {/* 5. INVENTORY STOCK MANAGEMENT VIEW */}
             {activeTab === 'inventory' && (
               <div className="space-y-6">
-                
+
                 {/* Inventory HUD info row */}
-                <div className="bg-slate-950/40 p-5 border border-white/5 rounded-2xl flex flex-col md:flex-row md:items-center justify-between gap-4">
+                <div className="bg-gray-300 p-5 border border-white/5 rounded-2xl flex flex-col md:flex-row md:items-center justify-between gap-4">
                   <div>
                     <span className="font-space text-xs font-bold text-amber-500 uppercase tracking-widest block">
                       Active Logistics Dashboard
@@ -1090,7 +1088,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
                       Monitor unit warehouse levels. Zero-inventory locks the cart checkout trigger for client safety automatically.
                     </p>
                   </div>
-                  
+
                   <div className="flex space-x-4 text-xs font-space">
                     <div className="px-4 py-2 border border-rose-500/20 bg-rose-500/5 rounded-xl">
                       <span className="text-slate-400 block text-[9px] uppercase font-bold tracking-widest">OUT OF STOCK</span>
@@ -1122,7 +1120,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
                           <span className={`text-[10px] font-space font-bold uppercase block mt-1 ${isOut ? 'text-rose-500 animate-pulse' : isLow ? 'text-orange-400' : 'text-emerald-400'}`}>
                             {isOut ? '❌ Locked: OUT OF STOCK' : isLow ? '⚠️ Low Stock warning' : '✅ Active Level'}
                           </span>
-                          
+
                           <div className="flex items-center space-x-2 mt-2.5">
                             <span className="font-orbitron font-black text-xs text-slate-300 shrink-0">STOCK:</span>
                             {/* Stock increment dec buttons */}
@@ -1170,9 +1168,9 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
             {/* 6. ORDERS LOGGER VIEW */}
             {activeTab === 'orders' && (
               <div className="space-y-6">
-                
+
                 {/* Orders Overview stats info */}
-                <div className="bg-slate-950/40 p-5 border border-white/5 rounded-2xl">
+                <div className="bg-gray-300 p-5 border border-white/5 rounded-2xl">
                   <span className="font-space text-xs font-bold text-amber-500 uppercase tracking-widest block">
                     Clients Checkout Logs
                   </span>
@@ -1186,7 +1184,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
                   <div className="overflow-x-auto w-full">
                     <table className="w-full text-left border-collapse">
                       <thead>
-                        <tr className="bg-slate-950/80 border-b border-white/5 text-[9px] font-space text-slate-400 uppercase tracking-widest">
+                        <tr className="bg-gray-300 border-b border-white/5 text-[9px] font-space text-slate-400 uppercase tracking-widest">
                           <th className="p-5 font-bold">Order ID</th>
                           <th className="p-5 font-bold">Client Name</th>
                           <th className="p-5 font-bold">Ordered Roster</th>
@@ -1208,7 +1206,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
                             return (
                               <tr key={o.id} className="hover:bg-slate-900/10 transition-colors">
                                 <td className="p-5 font-space text-[10px] font-bold text-amber-500">
-                                  #{o.id.substring(0,8).toUpperCase()}
+                                  #{o.id.substring(0, 8).toUpperCase()}
                                 </td>
                                 <td className="p-5">
                                   <span className="font-orbitron font-bold text-xs text-white block">{o.customer_name}</span>
@@ -1233,13 +1231,12 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
                                 <td className="p-5 text-center">
                                   <button
                                     onClick={() => handleUpdateOrderStatus(o.id, o.status)}
-                                    className={`px-4 py-2 rounded-xl font-space text-[10px] font-bold uppercase tracking-widest transition-all duration-300 cursor-pointer border inline-flex items-center space-x-1.5 ${
-                                      isPending 
-                                        ? 'bg-amber-500/10 border-amber-500/20 text-amber-500 hover:bg-amber-500/20'
-                                        : isShipping
-                                        ? 'bg-blue-500/10 border-blue-500/20 text-blue-400 hover:bg-blue-500/20'
-                                        : 'bg-emerald-500/10 border-emerald-500/20 text-[#10b981] hover:bg-emerald-500/20'
-                                    }`}
+                                    className={`px-4 py-2 rounded-xl font-space text-[10px] font-bold uppercase tracking-widest transition-all duration-300 cursor-pointer border inline-flex items-center space-x-1.5 ${isPending
+                                      ? 'bg-yellow-500 border-amber-500/20 text-amber-500 hover:bg-amber-500/20'
+                                      : isShipping
+                                        ? 'bg-blue-500 border-blue-500 text-blue-400 hover:bg-blue-500/20'
+                                        : 'bg-green-500 border-emerald-500/20 text-[#10b981] hover:bg-emerald-500/20'
+                                      }`}
                                   >
                                     {isPending ? (
                                       <>
@@ -1248,7 +1245,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
                                       </>
                                     ) : isShipping ? (
                                       <>
-                                        <Activity className="w-3 h-3 text-blue-400" />
+                                        <Activity className="w-3 h-3 text-blue-900" />
                                         <span>SHIPPING (ARRIVE NOW)</span>
                                       </>
                                     ) : (
@@ -1274,16 +1271,16 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
             {/* 7. SETTINGS CONSOLE VIEW */}
             {activeTab === 'settings' && (
               <div className="space-y-6">
-                
+
                 {/* Visual cockpit control settings panel */}
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                  
+
                   {/* Cockpit dials */}
                   <div className="glass-panel p-6 rounded-2xl border border-white/5 relative">
                     <span className="font-space text-[10px] text-slate-400 font-bold uppercase tracking-widest block mb-4">
                       Cockpit control telemetry
                     </span>
-                    
+
                     <div className="space-y-5 text-xs font-space">
                       {[
                         { name: 'Core processing flow', speed: 'MAX SPEED', percent: 98, color: 'from-[#10b981] to-teal-400' },
@@ -1295,10 +1292,10 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
                             <span className="text-slate-300 uppercase">{dial.name}</span>
                             <span className="text-amber-500 text-[10px]">{dial.speed}</span>
                           </div>
-                          
+
                           {/* Dials progress slider bar */}
                           <div className="w-full h-1.5 bg-slate-950 rounded-full overflow-hidden relative border border-white/5">
-                            <div 
+                            <div
                               className={`h-full bg-linear-to-r ${dial.color}`}
                               style={{ width: `${dial.percent}%` }}
                             />
@@ -1314,7 +1311,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
                       <span className="font-space text-[10px] text-slate-400 font-bold uppercase tracking-widest block mb-4">
                         Mainframe diagnostics log
                       </span>
-                      
+
                       <div className="space-y-2.5 font-space text-xs">
                         <div className="flex justify-between border-b border-white/5 pb-2">
                           <span className="text-slate-400 uppercase">Supabase SDK:</span>
@@ -1351,18 +1348,18 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
       {/* PRODUCT CRUD MODAL FORM EDITOR */}
       {/* ------------------------------------------------------------- */}
       {isProductModalOpen && (
-        <div className="fixed inset-0 bg-slate-950/80 backdrop-blur-md flex items-center justify-center p-4 z-50 overflow-y-auto">
-          <motion.div 
+        <div className="fixed inset-0 bg-gray-300 backdrop-blur-md flex items-center justify-center p-4 z-50 overflow-y-auto">
+          <motion.div
             initial={{ opacity: 0, scale: 0.95 }}
             animate={{ opacity: 1, scale: 1 }}
             exit={{ opacity: 0, scale: 0.95 }}
-            className="w-full max-w-2xl rounded-2xl border border-white/10 glass-panel bg-slate-950/90 shadow-2xl p-6 relative overflow-hidden"
+            className="w-full max-w-2xl rounded-2xl border border-white/10 glass-panel bg-gray-300 shadow-2xl p-6 relative overflow-hidden"
           >
             <div className="flex items-center justify-between border-b border-white/5 pb-4 mb-5">
               <span className="font-orbitron font-extrabold text-sm text-white uppercase tracking-wider">
                 {editingProduct ? 'EDIT SYSTEM PRODUCT' : 'NEW ACCESSORY REGISTRATION'}
               </span>
-              <button 
+              <button
                 onClick={() => setIsProductModalOpen(false)}
                 className="p-1.5 rounded-lg bg-slate-900 border border-white/5 hover:border-white/20 text-slate-450 hover:text-slate-200 transition-colors cursor-pointer"
               >
@@ -1372,11 +1369,11 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
 
             <form onSubmit={handleProductSubmit} className="space-y-4 font-space text-xs">
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                
+
                 {/* Product Name */}
                 <div className="space-y-1.5">
                   <label className="text-slate-400 uppercase font-bold text-[9px] tracking-widest block">PRODUCT TITLE</label>
-                  <input 
+                  <input
                     type="text"
                     required
                     value={productForm.name}
@@ -1406,7 +1403,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
                 {/* Price */}
                 <div className="space-y-1.5">
                   <label className="text-slate-400 uppercase font-bold text-[9px] tracking-widest block">PRICE (₹ INR)</label>
-                  <input 
+                  <input
                     type="number"
                     required
                     min={0}
@@ -1420,7 +1417,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
                 {/* Stock Count */}
                 <div className="space-y-1.5">
                   <label className="text-slate-400 uppercase font-bold text-[9px] tracking-widest block">WAREHOUSE STOCK LEVEL</label>
-                  <input 
+                  <input
                     type="number"
                     required
                     min={0}
@@ -1435,7 +1432,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
               {/* Description */}
               <div className="space-y-1.5">
                 <label className="text-slate-400 uppercase font-bold text-[9px] tracking-widest block">TECHNICAL DESCRIPTION</label>
-                <textarea 
+                <textarea
                   required
                   rows={2}
                   value={productForm.description}
@@ -1449,10 +1446,10 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
               <div className="space-y-1.5">
                 <label className="text-slate-400 uppercase font-bold text-[9px] tracking-widest block">PRODUCT IMAGERY ASSETS</label>
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                  
+
                   {/* File Upload card */}
                   <div className="md:col-span-2 relative flex flex-col items-center justify-center p-4 border border-dashed border-white/10 hover:border-amber-400/20 bg-slate-900/30 rounded-xl transition-all duration-300">
-                    <input 
+                    <input
                       type="file"
                       accept="image/*"
                       onChange={(e) => handleImageFileChange(e, 'product')}
@@ -1461,7 +1458,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
                     <Eye className="w-6 h-6 text-slate-500 mb-2 group-hover:text-amber-400" />
                     <span className="text-[10px] text-slate-400 uppercase font-bold">CHOOSE IMAGE FILE</span>
                     <span className="text-[8px] text-slate-500 block mt-1">Automatic Cloud Upload</span>
-                    
+
                     {/* Live Progress HUD */}
                     {uploadProgress !== null && (
                       <div className="w-full bg-slate-950 h-1.5 rounded-full overflow-hidden mt-3 border border-white/5">
@@ -1485,7 +1482,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
               {/* Specs String */}
               <div className="space-y-1.5">
                 <label className="text-slate-400 uppercase font-bold text-[9px] tracking-widest block">SPECIFICATIONS (COMMA SEPARATED LIST)</label>
-                <input 
+                <input
                   type="text"
                   value={productForm.specsString}
                   onChange={(e) => setProductForm(prev => ({ ...prev, specsString: e.target.value }))}
@@ -1497,7 +1494,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
               {/* Toggles row */}
               <div className="flex flex-wrap gap-5 bg-slate-900/20 border border-white/5 p-4 rounded-xl">
                 <label className="flex items-center space-x-3 cursor-pointer">
-                  <input 
+                  <input
                     type="checkbox"
                     checked={productForm.isNewArrival}
                     onChange={(e) => setProductForm(prev => ({ ...prev, isNewArrival: e.target.checked }))}
@@ -1537,18 +1534,18 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
       {/* OFFERS CRUD MODAL FORM EDITOR */}
       {/* ------------------------------------------------------------- */}
       {isOfferModalOpen && (
-        <div className="fixed inset-0 bg-slate-950/80 backdrop-blur-md flex items-center justify-center p-4 z-50 overflow-y-auto">
-          <motion.div 
+        <div className="fixed inset-0 bg-gray-300 backdrop-blur-md flex items-center justify-center p-4 z-50 overflow-y-auto">
+          <motion.div
             initial={{ opacity: 0, scale: 0.95 }}
             animate={{ opacity: 1, scale: 1 }}
             exit={{ opacity: 0, scale: 0.95 }}
-            className="w-full max-w-2xl rounded-2xl border border-white/10 glass-panel bg-slate-950/90 shadow-2xl p-6 relative overflow-hidden"
+            className="w-full max-w-2xl rounded-2xl border border-white/10 glass-panel bg-gray-300 shadow-2xl p-6 relative overflow-hidden"
           >
             <div className="flex items-center justify-between border-b border-white/5 pb-4 mb-5">
               <span className="font-orbitron font-extrabold text-sm text-white uppercase tracking-wider">
                 {editingOffer ? 'MODIFY PROMO CAMPAIGN' : 'LAUNCH NEW CAMPAIGN'}
               </span>
-              <button 
+              <button
                 onClick={() => setIsOfferModalOpen(false)}
                 className="p-1.5 rounded-lg bg-slate-900 border border-white/5 hover:border-white/20 text-slate-450 hover:text-slate-200 transition-colors cursor-pointer"
               >
@@ -1558,11 +1555,11 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
 
             <form onSubmit={handleOfferSubmit} className="space-y-4 font-space text-xs">
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                
+
                 {/* Offer Title */}
                 <div className="space-y-1.5">
                   <label className="text-slate-400 uppercase font-bold text-[9px] tracking-widest block">CAMPAIGN TITLE</label>
-                  <input 
+                  <input
                     type="text"
                     required
                     value={offerForm.title}
@@ -1575,7 +1572,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
                 {/* Coupon Code */}
                 <div className="space-y-1.5">
                   <label className="text-slate-400 uppercase font-bold text-[9px] tracking-widest block">COUPON CODE</label>
-                  <input 
+                  <input
                     type="text"
                     required
                     value={offerForm.code}
@@ -1588,7 +1585,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
                 {/* Promo Value */}
                 <div className="space-y-1.5">
                   <label className="text-slate-400 uppercase font-bold text-[9px] tracking-widest block">DISCOUNT VALUE</label>
-                  <input 
+                  <input
                     type="text"
                     required
                     value={offerForm.discount}
@@ -1601,7 +1598,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
                 {/* Applies To */}
                 <div className="space-y-1.5">
                   <label className="text-slate-400 uppercase font-bold text-[9px] tracking-widest block">APPLIES TO SECTOR</label>
-                  <input 
+                  <input
                     type="text"
                     required
                     value={offerForm.appliesTo}
@@ -1615,7 +1612,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
               {/* Description */}
               <div className="space-y-1.5">
                 <label className="text-slate-400 uppercase font-bold text-[9px] tracking-widest block">CAMPAIGN DESCRIPTION</label>
-                <textarea 
+                <textarea
                   required
                   rows={2}
                   value={offerForm.description}
@@ -1644,10 +1641,10 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
               <div className="space-y-1.5">
                 <label className="text-slate-400 uppercase font-bold text-[9px] tracking-widest block">PROMO COVER GRAPHIC</label>
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                  
+
                   {/* File Upload trigger */}
                   <div className="md:col-span-2 relative flex flex-col items-center justify-center p-4 border border-dashed border-white/10 hover:border-amber-400/20 bg-slate-900/30 rounded-xl transition-all duration-300">
-                    <input 
+                    <input
                       type="file"
                       accept="image/*"
                       onChange={(e) => handleImageFileChange(e, 'offer')}
@@ -1655,7 +1652,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
                     />
                     <Eye className="w-6 h-6 text-slate-500 mb-2 group-hover:text-amber-400" />
                     <span className="text-[10px] text-slate-400 uppercase font-bold">CHOOSE BANNER IMAGE</span>
-                    
+
                     {/* Progress HUD */}
                     {uploadProgress !== null && (
                       <div className="w-full bg-slate-950 h-1.5 rounded-full overflow-hidden mt-3 border border-white/5">
