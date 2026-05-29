@@ -550,3 +550,50 @@ td {
 .light .text-amber-400 {
   color: #b45309 !important; /* Rich amber 700 for great accessibility contrast */
 }
+
+/* Custom Cyber-Green & Saturated Background Overrides for Light Mode */
+.light .bg-\[\#091510\] {
+  background-color: #ecfdf5 !important;
+  color: #065f46 !important;
+}
+.light .bg-\[\#091510\]\/40,
+.light .bg-\[\#091510\/40\] {
+  background-color: rgba(236, 253, 245, 0.6) !important;
+  color: #065f46 !important;
+}
+.light .bg-\[\#0a0f0d\] {
+  background-color: #ffffff !important;
+  color: #111827 !important;
+}
+.light .bg-\[\#0a1c12\] {
+  background-color: #d1fae5 !important;
+  color: #065f46 !important;
+}
+
+/* Force dark green text inside lightened green cyber elements for accessibility */
+.light .bg-\[\#091510\] *,
+.light .bg-\[\#091510\]\/40 *,
+.light .bg-\[\#091510\/40\] *,
+.light .bg-\[\#0a1c12\] * {
+  color: #065f46 !important;
+}
+
+/* Maintain light letters on solid dark/saturated CTA buttons in Light Mode */
+.light button[class*="bg-emerald-"] *,
+.light button[class*="bg-green-"] *,
+.light button[class*="bg-teal-"] *,
+.light button[class*="bg-indigo-"] *,
+.light button[class*="bg-rose-"] *,
+.light button[class*="bg-blue-"] *,
+.light button[class*="bg-amber-"] *,
+.light button[class*="from-"] *,
+.light button[class*="bg-emerald-"],
+.light button[class*="bg-green-"],
+.light button[class*="bg-teal-"],
+.light button[class*="bg-indigo-"],
+.light button[class*="bg-rose-"],
+.light button[class*="bg-blue-"],
+.light button[class*="bg-amber-"],
+.light button[class*="from-"] {
+  color: #ffffff !important;
+}
