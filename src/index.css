@@ -523,3 +523,30 @@ td {
 .light footer .cyber-glow-orb {
   display: none !important;
 }
+
+/* Admin Dashboard Light Theme Overrides */
+.light .bg-\[\#030712\] {
+  background-color: #f9fafb !important;
+}
+.light .bg-slate-950\/20 {
+  background-color: #f3f4f6 !important;
+}
+.light .bg-slate-950\/30 {
+  background-color: #f3f4f6 !important;
+}
+.light .bg-slate-950\/80 {
+  background-color: rgba(0, 0, 0, 0.4) !important;
+  backdrop-filter: blur(8px) !important;
+}
+.light .bg-slate-900\/40 {
+  background-color: #f3f4f6 !important;
+}
+.light .bg-amber-500\/10 {
+  background-color: rgba(180, 83, 9, 0.08) !important;
+}
+.light .border-amber-500\/20 {
+  border-color: rgba(180, 83, 9, 0.2) !important;
+}
+.light .text-amber-400 {
+  color: #b45309 !important; /* Rich amber 700 for great accessibility contrast */
+}

@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { 
   LayoutDashboard, 
@@ -21,7 +21,9 @@ import {
   X, 
   Lock, 
   Eye, 
-  AlertTriangle 
+  AlertTriangle,
+  Sun,
+  Moon
 } from 'lucide-react';
 import { supabase, isSupabaseConfigured } from '../../services/supabaseClient';
 import type { Product } from '../ui/ProductCard';
@@ -53,6 +55,29 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
   const [searchQuery, setSearchQuery] = useState<string>('');
   const [categoryFilter, setCategoryFilter] = useState<string>('All');
   const [sortBy, setSortBy] = useState<string>('name-asc');
+  
+  // Theme Toggle State
+  const [theme, setTheme] = useState<'light' | 'dark'>(() => {
+    if (typeof window !== 'undefined') {
+      return (localStorage.getItem('theme') as 'light' | 'dark') || 'dark';
+    }
+    return 'dark';
+  });
+
+  // Sync theme to document element and localStorage
+  useEffect(() => {
+    const root = document.documentElement;
+    if (theme === 'light') {
+      root.classList.add('light');
+    } else {
+      root.classList.remove('light');
+    }
+    localStorage.setItem('theme', theme);
+  }, [theme]);
+
+  const toggleTheme = () => {
+    setTheme(prev => (prev === 'light' ? 'dark' : 'light'));
+  };
   
   // Modals / Editors State
   const [isProductModalOpen, setIsProductModalOpen] = useState(false);
@@ -596,11 +621,27 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
             </p>
           </div>
 
-          <div className="flex items-center space-x-2 bg-slate-950/60 border border-white/5 rounded-xl px-4 py-2 text-xs font-space">
-            <div className={`w-2 h-2 rounded-full animate-ping ${isSupabaseConfigured ? 'bg-[#10b981]' : 'bg-amber-500'}`} />
-            <span className="text-slate-400 font-bold uppercase tracking-widest text-[9px]">
-              {isSupabaseConfigured ? 'CLOUDSYNC: SECURE' : 'LOCALSEED FALLBACK'}
-            </span>
+          <div className="flex items-center space-x-3">
+            {/* Theme Toggle Button */}
+            <button 
+              onClick={toggleTheme}
+              title="Switch Theme"
+              className="p-2.5 rounded-xl border border-white/10 hover:border-emerald-500/50 hover:bg-emerald-500/5 transition-all duration-300 cursor-pointer group flex items-center justify-center text-slate-300 hover:text-emerald-400"
+            >
+              {theme === 'light' ? (
+                <Moon className="w-4.5 h-4.5 text-slate-500 group-hover:text-[#10b981] transition-all" />
+              ) : (
+                <Sun className="w-4.5 h-4.5 text-amber-400 group-hover:text-amber-300 transition-all drop-shadow-[0_0_8px_rgba(245,158,11,0.5)]" />
+              )}
+            </button>
+
+            {/* Connection status diagnostics */}
+            <div className="flex items-center space-x-2 bg-slate-950/60 border border-white/5 rounded-xl px-4 py-2 text-xs font-space">
+              <div className={`w-2 h-2 rounded-full animate-ping ${isSupabaseConfigured ? 'bg-[#10b981]' : 'bg-amber-500'}`} />
+              <span className="text-slate-400 font-bold uppercase tracking-widest text-[9px]">
+                {isSupabaseConfigured ? 'CLOUDSYNC: SECURE' : 'LOCALSEED FALLBACK'}
+              </span>
+            </div>
           </div>
         </div>
 
