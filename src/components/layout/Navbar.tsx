@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { ShoppingBag, Menu, X, Cpu } from 'lucide-react';
+import { ShoppingBag, Menu, X, Cpu, Sun, Moon } from 'lucide-react';
 
 interface NavbarProps {
   cartCount: number;
@@ -9,6 +9,12 @@ interface NavbarProps {
 export const Navbar: React.FC<NavbarProps> = ({ cartCount, onCartClick }) => {
   const [isScrolled, setIsScrolled] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const [theme, setTheme] = useState<'light' | 'dark'>(() => {
+    if (typeof window !== 'undefined') {
+      return (localStorage.getItem('theme') as 'light' | 'dark') || 'dark';
+    }
+    return 'dark';
+  });
 
   useEffect(() => {
     const handleScroll = () => {
@@ -18,6 +24,21 @@ export const Navbar: React.FC<NavbarProps> = ({ cartCount, onCartClick }) => {
     window.addEventListener('scroll', handleScroll);
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
+
+  // Sync theme to document element and localStorage
+  useEffect(() => {
+    const root = document.documentElement;
+    if (theme === 'light') {
+      root.classList.add('light');
+    } else {
+      root.classList.remove('light');
+    }
+    localStorage.setItem('theme', theme);
+  }, [theme]);
+
+  const toggleTheme = () => {
+    setTheme(prev => (prev === 'light' ? 'dark' : 'light'));
+  };
 
   return (
     <nav className={`fixed top-0 left-0 w-full z-50 transition-all duration-500 ${
@@ -55,6 +76,19 @@ export const Navbar: React.FC<NavbarProps> = ({ cartCount, onCartClick }) => {
 
         {/* ACTIONS */}
         <div className="flex items-center space-x-4">
+          {/* Theme Toggle Button */}
+          <button 
+            onClick={toggleTheme}
+            title="Switch Theme"
+            className="p-2.5 rounded-xl border border-white/10 hover:border-[#10b981]/50 hover:bg-[#10b981]/5 transition-all duration-300 cursor-pointer group flex items-center justify-center text-slate-300 hover:text-[#10b981]"
+          >
+            {theme === 'light' ? (
+              <Moon className="w-5 h-5 text-slate-500 group-hover:text-[#10b981] transition-all" />
+            ) : (
+              <Sun className="w-5 h-5 text-amber-400 group-hover:text-amber-300 transition-all drop-shadow-[0_0_8px_rgba(245,158,11,0.5)]" />
+            )}
+          </button>
+
           {/* Cart Button */}
           <button 
             onClick={onCartClick}

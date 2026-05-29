@@ -192,3 +192,334 @@
   0% { transform: translateX(0); }
   100% { transform: translateX(-50%); }
 }
+
+/* Theme Transition for background, text, borders, glass */
+body,
+.glass-panel,
+.glass-card,
+.cyber-grid-container,
+.perspective-grid,
+nav,
+footer,
+div,
+span,
+section,
+p,
+a,
+button,
+h1, h2, h3, h4, h5, h6,
+input,
+select,
+textarea,
+table,
+thead,
+tbody,
+tr,
+th,
+td {
+  transition: background-color 350ms cubic-bezier(0.4, 0, 0.2, 1), 
+              color 350ms cubic-bezier(0.4, 0, 0.2, 1), 
+              border-color 350ms cubic-bezier(0.4, 0, 0.2, 1), 
+              box-shadow 350ms cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* LIGHT THEME SYSTEM OVERRIDES */
+.light,
+.light body,
+.light :root {
+  background-color: #f9fafb !important;
+  color: #111827 !important;
+}
+
+/* Scrollbar Light Override */
+.light ::-webkit-scrollbar-track {
+  background: #f9fafb !important;
+}
+.light ::-webkit-scrollbar-thumb {
+  background: #cbd5e1 !important;
+  border: 2px solid #f9fafb !important;
+}
+.light ::-webkit-scrollbar-thumb:hover {
+  background: #94a3b8 !important;
+}
+
+/* Background Overrides */
+.light .bg-slate-950,
+.light .bg-slate-900,
+.light .bg-slate-800,
+.light .bg-\[\#050806\],
+.light .bg-\[\#0a140f\],
+.light .bg-\[\#0a0f0d\],
+.light .bg-\[\#0f1712\] {
+  background-color: #ffffff !important;
+}
+
+/* Semi-transparent Dark Backgrounds converted to soft translucent lights */
+.light .bg-slate-950\/50,
+.light .bg-slate-950\/60,
+.light .bg-slate-950\/70,
+.light .bg-slate-950\/80,
+.light .bg-slate-900\/30,
+.light .bg-slate-900\/40,
+.light .bg-slate-900\/50,
+.light .bg-slate-900\/60,
+.light .bg-slate-900\/80,
+.light .bg-slate-900\/90,
+.light .bg-black\/20,
+.light .bg-black\/40,
+.light .bg-black\/60 {
+  background-color: rgba(255, 255, 255, 0.8) !important;
+}
+
+.light .bg-slate-900\/10,
+.light .bg-slate-900\/20,
+.light .bg-slate-900\/5,
+.light .hover\:bg-slate-900\/10:hover,
+.light .hover\:bg-slate-900\/20:hover,
+.light .hover\:bg-slate-900\/30:hover {
+  background-color: rgba(0, 0, 0, 0.04) !important;
+}
+
+/* Glass Panels & Cards Overrides */
+.light .glass-panel {
+  background: rgba(255, 255, 255, 0.75) !important;
+  border-color: rgba(0, 0, 0, 0.08) !important;
+  box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.04) !important;
+}
+
+.light .glass-panel-dark {
+  background: rgba(243, 244, 246, 0.85) !important;
+  border-color: rgba(0, 0, 0, 0.06) !important;
+}
+
+.light .glass-card {
+  background: rgba(255, 255, 255, 0.65) !important;
+  border-color: rgba(0, 0, 0, 0.06) !important;
+  box-shadow: 
+    0 10px 30px -10px rgba(0, 0, 0, 0.05),
+    0 1px 1px 0 rgba(255, 255, 255, 0.9) inset !important;
+}
+
+.light .glass-card:hover {
+  background: rgba(255, 255, 255, 0.9) !important;
+  box-shadow: 
+    0 20px 40px -15px rgba(5, 150, 105, 0.08),
+    0 0 20px rgba(5, 150, 105, 0.06) !important;
+  border-color: rgba(5, 150, 105, 0.2) !important;
+}
+
+/* Cyber Grid Background Overrides */
+.light .cyber-grid-container {
+  background: radial-gradient(circle at 50% 30%, #f3f4f6 0%, #f9fafb 80%) !important;
+}
+
+.light .perspective-grid {
+  background-image: 
+    linear-gradient(to right, rgba(5, 150, 105, 0.06) 1px, transparent 1px),
+    linear-gradient(to bottom, rgba(5, 150, 105, 0.06) 1px, transparent 1px) !important;
+}
+
+.light .cyber-glow-orb {
+  opacity: 0.05 !important;
+  mix-blend-mode: multiply !important;
+}
+
+/* Typography Color Overrides */
+.light .text-white,
+.light h1,
+.light h2,
+.light h3,
+.light h4,
+.light h5,
+.light h6 {
+  color: #111827 !important;
+}
+
+.light .text-slate-100,
+.light .text-slate-200,
+.light .text-slate-300,
+.light .text-slate-400 {
+  color: #374151 !important; /* Rich readable dark gray */
+}
+
+.light .text-slate-500 {
+  color: #6b7280 !important; /* Medium slate gray for secondary info */
+}
+
+.light .text-slate-600 {
+  color: #4b5563 !important;
+}
+
+/* Styled Brand Neon Accent Tones for Light Mode Accessibility */
+.light .text-emerald-400 {
+  color: #059669 !important; /* Emerald 600 */
+}
+.light .text-cyan-400 {
+  color: #0891b2 !important; /* Cyan 600 */
+}
+.light .text-amber-400 {
+  color: #d97706 !important; /* Amber 600 */
+}
+.light .text-purple-400 {
+  color: #7c3aed !important; /* Purple 600 */
+}
+.light .text-neon-cyan {
+  color: #0891b2 !important;
+}
+.light .text-neon-green {
+  color: #059669 !important;
+}
+
+/* Border Overrides */
+.light .border-white\/5,
+.light .border-white\/8,
+.light .border-white\/10,
+.light .border-white\/20,
+.light .border-slate-800,
+.light .border-slate-900 {
+  border-color: rgba(0, 0, 0, 0.08) !important;
+}
+
+.light .border-emerald-500\/10,
+.light .border-emerald-500\/20 {
+  border-color: rgba(5, 150, 105, 0.15) !important;
+}
+
+.light .border-cyan-500\/10 {
+  border-color: rgba(8, 145, 178, 0.15) !important;
+}
+
+/* Inputs, Textareas and Dropdowns overrides */
+.light input,
+.light select,
+.light textarea {
+  background-color: #ffffff !important;
+  color: #111827 !important;
+  border: 1px solid rgba(0, 0, 0, 0.15) !important;
+}
+
+.light input::placeholder,
+.light textarea::placeholder {
+  color: #9ca3af !important;
+}
+
+.light input:focus,
+.light select:focus,
+.light textarea:focus {
+  border-color: #059669 !important;
+  box-shadow: 0 0 0 2px rgba(5, 150, 105, 0.1) !important;
+}
+
+/* Dialog Backdrop Override */
+.light .bg-black\/60 {
+  background-color: rgba(0, 0, 0, 0.45) !important;
+  backdrop-filter: blur(4px) !important;
+}
+
+/* Floating widgets matching light mode */
+.light .bg-slate-950\/60,
+.light .bg-slate-950\/95,
+.light .bg-slate-950\/80 {
+  background-color: rgba(255, 255, 255, 0.95) !important;
+  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.08) !important;
+}
+
+.light .bg-slate-950\/60 {
+  background-color: rgba(255, 255, 255, 0.75) !important;
+}
+
+/* Roster / Order Badges */
+.light .bg-slate-900\/30 {
+  background-color: #f3f4f6 !important;
+}
+
+/* Tables and logs */
+.light thead {
+  background-color: #f3f4f6 !important;
+}
+.light tr.hover\:bg-slate-900\/10:hover {
+  background-color: rgba(0, 0, 0, 0.02) !important;
+}
+.light td {
+  border-bottom-color: rgba(0, 0, 0, 0.05) !important;
+}
+
+/* Custom interactive button background overrides */
+.light .hover\:bg-emerald-500\/5:hover {
+  background-color: rgba(5, 150, 105, 0.05) !important;
+}
+.light .hover\:border-emerald-500\/30:hover {
+  border-color: rgba(5, 150, 105, 0.3) !important;
+}
+
+.light .bg-linear-to-r {
+  /* Soft Tones for Gradients */
+  background-image: linear-gradient(to right, #059669, #0891b2) !important;
+}
+.light .bg-linear-to-br {
+  background-image: linear-gradient(to bottom right, #059669, #0891b2) !important;
+}
+.light .bg-clip-text {
+  background-image: linear-gradient(to right, #059669, #0891b2) !important;
+}
+
+/* Specific elements adjustments */
+.light .glow-text-cyan,
+.light .glow-text-purple {
+  text-shadow: none !important;
+}
+
+.light .border-neon-hover::after {
+  background: linear-gradient(135deg, #059669, #0891b2) border-box !important;
+}
+
+/* Close buttons X inside drawer/modals */
+.light button .lucide-x {
+  color: #4b5563 !important;
+}
+.light button:hover .lucide-x {
+  color: #111827 !important;
+}
+
+/* Footer Light Theme Overrides */
+.light footer {
+  background-color: #f3f4f6 !important;
+  border-top-color: rgba(0, 0, 0, 0.08) !important;
+}
+.light footer p {
+  color: #4b5563 !important;
+}
+.light footer a {
+  color: #4b5563 !important;
+}
+.light footer a:hover {
+  color: #059669 !important;
+}
+.light footer h4 {
+  color: #111827 !important;
+}
+.light footer .text-slate-400 {
+  color: #4b5563 !important;
+}
+.light footer .text-slate-500 {
+  color: #6b7280 !important;
+}
+.light footer .border-white\/5,
+.light footer .border-white\/10 {
+  border-color: rgba(0, 0, 0, 0.08) !important;
+}
+.light footer input {
+  background-color: #ffffff !important;
+  color: #111827 !important;
+  border-color: rgba(0, 0, 0, 0.15) !important;
+}
+.light footer input:focus {
+  background-color: #ffffff !important;
+  border-color: #059669 !important;
+}
+.light footer .bg-slate-950 {
+  background-color: #ffffff !important;
+}
+.light footer .cyber-glow-orb {
+  display: none !important;
+}

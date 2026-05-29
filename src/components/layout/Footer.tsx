@@ -49,7 +49,7 @@ export const Footer: React.FC = () => {
               <a 
                 key={idx} 
                 href="#" 
-                className={`w-9 h-9 rounded-xl border border-white/10 flex items-center justify-center text-slate-450 transition-all duration-300 ${soc.color}`}
+                className={`w-9 h-9 rounded-xl border border-white/10 flex items-center justify-center text-slate-400 transition-all duration-300 ${soc.color}`}
               >
                 {soc.icon}
               </a>
