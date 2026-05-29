@@ -26,6 +26,7 @@ import {
 import { supabase, isSupabaseConfigured } from '../../services/supabaseClient';
 import type { Product } from '../ui/ProductCard';
 import type { Offer } from '../../data/offers';
+import { TopSellingChart } from './TopSellingChart';
 
 interface AdminDashboardProps {
   products: Product[];
@@ -94,11 +95,13 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
 
   // Fetch Stats dynamically
   const totalProducts = products.length;
-  const totalOrders = orders.length;
+  const totalOrders = orders.filter(o => o.status === 'pending').length;
   const lowStockCount = products.filter(p => p.stockCount <= 5).length;
   const activeOffersCount = offers.filter(o => o.active !== false).length;
   const newArrivalsCount = products.filter(p => p.isNewArrival).length;
-  const totalRevenue = orders.reduce((sum, order) => sum + (order.total_amount || 0), 0);
+  const totalRevenue = orders
+    .filter(o => o.status === 'delivered')
+    .reduce((sum, order) => sum + (order.total_amount || 0), 0);
 
   // Pre-fill Product Form
   const openProductModal = (product: Product | null = null) => {
@@ -619,8 +622,8 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
                 <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-5">
                   {[
                     { title: 'Total Roster Items', value: totalProducts, icon: <ShoppingBag className="w-5 h-5 text-emerald-400" />, label: 'Active product units', border: 'border-emerald-500/10' },
-                    { title: 'Simulated Revenue', value: `₹${totalRevenue.toLocaleString('en-IN')}`, icon: <TrendingUp className="w-5 h-5 text-amber-400" />, label: 'Accumulated flow', border: 'border-amber-500/10' },
-                    { title: 'Total Orders Logged', value: totalOrders, icon: <ClipboardList className="w-5 h-5 text-purple-400" />, label: 'Checkout purchase records', border: 'border-purple-500/10' },
+                    { title: 'Simulated Revenue', value: `₹${totalRevenue.toLocaleString('en-IN')}`, icon: <TrendingUp className="w-5 h-5 text-amber-400" />, label: 'Delivered orders yield', border: 'border-amber-500/10' },
+                    { title: 'Total Orders Logged', value: totalOrders, icon: <ClipboardList className="w-5 h-5 text-purple-400" />, label: 'Pending orders queue', border: 'border-purple-500/10' },
                     { title: 'Critical Stock Alerts', value: lowStockCount, icon: <AlertTriangle className="w-5 h-5 text-rose-500" />, label: 'Units count <= 5', border: 'border-rose-500/10', warning: lowStockCount > 0 },
                     { title: 'Active Campaigns', value: activeOffersCount, icon: <Tag className="w-5 h-5 text-cyan-400" />, label: 'Coupons on storefront', border: 'border-cyan-500/10' }
                   ].map((card, idx) => (
@@ -650,46 +653,8 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
                 {/* Cyber charts row */}
                 <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
                   
-                  {/* Revenue flow graph chart wrapper */}
-                  <div className="glass-panel p-6 rounded-2xl border border-white/5 lg:col-span-2 relative">
-                    <span className="font-space text-[10px] text-slate-400 font-bold uppercase tracking-widest block mb-4">
-                      Simulated Revenue flow // Realtime monitor
-                    </span>
-                    
-                    {/* Futuristic glowing SVG Wave Graph */}
-                    <div className="w-full h-48 flex items-end relative overflow-hidden bg-slate-950/50 rounded-xl border border-white/5 p-2">
-                      <svg viewBox="0 0 500 150" className="w-full h-full overflow-visible">
-                        <defs>
-                          <linearGradient id="gradientFlow" x1="0%" y1="0%" x2="100%" y2="100%">
-                            <stop offset="0%" stopColor="#f59e0b" stopOpacity="0.4" />
-                            <stop offset="100%" stopColor="#10b981" stopOpacity="0.0" />
-                          </linearGradient>
-                        </defs>
-                        <path 
-                          d="M0,150 L0,80 C50,60 100,120 150,90 C200,60 250,30 300,70 C350,110 400,50 450,20 L500,60 L500,150 Z" 
-                          fill="url(#gradientFlow)" 
-                        />
-                        <path 
-                          d="M0,80 C50,60 100,120 150,90 C200,60 250,30 300,70 C350,110 400,50 450,20 L500,60" 
-                          fill="none" 
-                          stroke="#f59e0b" 
-                          strokeWidth="2.5" 
-                          className="drop-shadow-[0_0_10px_rgba(245,158,11,0.5)]"
-                        />
-                      </svg>
-                      {/* Interactive overlay specs */}
-                      <div className="absolute top-3 left-4 flex space-x-5 text-[9px] font-space text-slate-400">
-                        <span className="flex items-center space-x-1.5">
-                          <span className="w-1.5 h-1.5 rounded-full bg-amber-400" />
-                          <span>Velocity High</span>
-                        </span>
-                        <span className="flex items-center space-x-1.5">
-                          <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
-                          <span>Mainframe Live</span>
-                        </span>
-                      </div>
-                    </div>
-                  </div>
+                  {/* Top Selling Products chart component */}
+                  <TopSellingChart orders={orders} products={products} />
 
                   {/* Recent Activity Log list */}
                   <div className="glass-panel p-6 rounded-2xl border border-white/5 relative">

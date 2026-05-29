@@ -29,8 +29,8 @@ export const ProductCard: React.FC<ProductCardProps> = ({ product, onAddToCart }
     const x = e.clientX - box.left - box.width / 2;
     const y = e.clientY - box.top - box.height / 2;
     
-    // Rotate card on both axis (max 15 degrees) and scale up slightly
-    card.style.transform = `perspective(1000px) rotateX(${(-y / box.height) * 12}deg) rotateY(${(x / box.width) * 12}deg) scale3d(1.02, 1.02, 1.02)`;
+    // Rotate card on both axis (max 15 degrees) and scale up slightly and lift it up
+    card.style.transform = `perspective(1000px) rotateX(${(-y / box.height) * 12}deg) rotateY(${(x / box.width) * 12}deg) scale3d(1.02, 1.02, 1.02) translateY(-6px)`;
     
     // Dynamic lighting shine reflection overlay
     const glow = card.querySelector('.shine-overlay') as HTMLDivElement;
@@ -130,19 +130,7 @@ export const ProductCard: React.FC<ProductCardProps> = ({ product, onAddToCart }
         {product.description}
       </p>
 
-      {/* Spec list bullets if present */}
-      {product.specs && product.specs.length > 0 && (
-        <div 
-          className="hidden group-hover:flex flex-wrap gap-1.5 mb-4 animate-in fade-in slide-in-from-bottom-2 duration-300"
-          style={{ transform: 'translateZ(15px)' }}
-        >
-          {product.specs.slice(0, 2).map((spec, idx) => (
-            <span key={idx} className="text-[10px] font-space bg-slate-900/60 text-slate-350 px-2 py-0.5 rounded border border-white/5">
-              {spec}
-            </span>
-          ))}
-        </div>
-      )}
+
 
       {/* Divider */}
       <div className="w-full h-[1px] bg-white/5 mb-4" />

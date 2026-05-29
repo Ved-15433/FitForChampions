@@ -12,6 +12,7 @@ import { mockProducts } from './data/products';
 import { mockOffers, type Offer } from './data/offers';
 import { supabase, isSupabaseConfigured } from './services/supabaseClient';
 import { AdminDashboard } from './components/admin/AdminDashboard';
+import { FloatingCallButton } from './components/ui/FloatingCallButton';
 import { 
   Zap, 
   Activity, 
@@ -279,6 +280,29 @@ function App() {
       status: 'pending'
     };
 
+    // Format WhatsApp message
+    const lineItems = cartItems.map(item => `● ${item.product.name} x${item.quantity} (₹${(item.product.price * item.quantity).toLocaleString('en-IN')})`).join('\n');
+    
+    const waMessage = `🏆 FITFORCHAMPIONS - NEW ORDER 🏆\n\n` +
+      `👤 CUSTOMER DETAILS:\n` +
+      `-------------------\n` +
+      `● Name: ${customerName}\n` +
+      `● Contact: ${phone}\n` +
+      `● Address: ${address?.completeAddress || 'N/A'}\n` +
+      `● PIN Code: ${address?.pinCode || 'N/A'}\n\n` +
+      `🛒 ORDERED ROSTER:\n` +
+      `-------------------\n` +
+      `${lineItems}\n\n` +
+      `💰 BILLING REFORMS:\n` +
+      `-------------------\n` +
+      `● Subtotal: ₹${subtotal.toLocaleString('en-IN')}\n` +
+      `● Delivery: ${shipping === 0 ? 'FREE' : `₹${shipping}`}\n` +
+      (discountAmount > 0 ? `● Coupon Discount (${appliedCouponCode || 'Coupon'}): - ₹${discountAmount.toLocaleString('en-IN')}\n` : '') +
+      `● TOTAL INVESTMENT: ₹${totalAmount.toLocaleString('en-IN')}\n\n` +
+      `⚡ Dispatching database sync authorized! ⚡`;
+
+    const waUrl = `https://wa.me/919579722268?text=${encodeURIComponent(waMessage)}`;
+
     if (isSupabaseConfigured) {
       let { error } = await supabase.from('orders').insert([newOrderPayload]);
       
@@ -315,11 +339,13 @@ function App() {
         alert('Checkout sync failed: ' + error.message);
       } else {
         alert('ORDER SECURED! Syncing dispatcher database.');
+        window.open(waUrl, '_blank');
         setCartItems([]);
         setIsCartOpen(false);
       }
     } else {
       alert('SIMULATED CHECKOUT AUTHORIZED! Mock order logged in active logs.');
+      window.open(waUrl, '_blank');
       setOrders(prev => [
         {
           id: 'ord-' + Math.floor(Math.random() * 100000),
@@ -371,100 +397,106 @@ function App() {
   if (isAdminPath) {
     if (!isAdminAuthenticated) {
       return (
-        <div className="min-h-screen bg-[#030712] text-slate-100 flex items-center justify-center p-6 relative select-none selection:bg-amber-500/20 selection:text-amber-400 overflow-hidden">
-          {/* Cyber Background overlay layer */}
-          <CyberGrid />
+        <>
+          <div className="min-h-screen bg-[#030712] text-slate-100 flex items-center justify-center p-6 relative select-none selection:bg-amber-500/20 selection:text-amber-400 overflow-hidden">
+            {/* Cyber Background overlay layer */}
+            <CyberGrid />
 
-          <div className="absolute inset-0 bg-[radial-gradient(circle_500px_at_50%_40%,#1e1b4b,transparent)] pointer-events-none opacity-60" />
+            <div className="absolute inset-0 bg-[radial-gradient(circle_500px_at_50%_40%,#1e1b4b,transparent)] pointer-events-none opacity-60" />
 
-          {/* Secure Login glassmorphic card container */}
-          <div className="relative w-full max-w-md p-8 rounded-2xl glass-panel border border-white/5 bg-slate-950/80 shadow-2xl relative z-10 overflow-hidden">
-            
-            {/* Ambient orange light behind lock */}
-            <div className="absolute top-0 left-1/2 -translate-x-1/2 w-32 h-20 bg-amber-500/10 rounded-full blur-2xl pointer-events-none" />
-
-            <div className="text-center mb-8 flex flex-col items-center">
-              <div className="w-12 h-12 rounded-xl border border-amber-500/20 bg-amber-500/5 flex items-center justify-center mb-4">
-                <Lock className="w-5 h-5 text-amber-500 animate-pulse" />
-              </div>
-              <h1 className="font-orbitron font-extrabold text-lg text-white uppercase tracking-widest">
-                MAINFRAME LOCK
-              </h1>
-              <p className="font-space text-[10px] text-slate-500 mt-1.5 tracking-widest uppercase">
-                Champions Admin portal authorization
-              </p>
-            </div>
-
-            <form onSubmit={handleLoginSubmit} className="space-y-5 font-space text-xs">
+            {/* Secure Login glassmorphic card container */}
+            <div className="relative w-full max-w-md p-8 rounded-2xl glass-panel border border-white/5 bg-slate-950/80 shadow-2xl relative z-10 overflow-hidden">
               
-              {/* Email */}
-              <div className="space-y-2">
-                <label className="text-slate-400 font-bold uppercase tracking-wider block text-[9px]">CONSOLE SECURE USERNAME</label>
-                <input 
-                  type="email" 
-                  required
-                  placeholder="admin@champions.com"
-                  value={loginEmail}
-                  onChange={(e) => setLoginEmail(e.target.value)}
-                  className="w-full bg-slate-900 border border-white/5 focus:border-amber-400/40 rounded-xl px-4 py-3 text-white focus:outline-hidden placeholder-slate-600"
-                />
+              {/* Ambient orange light behind lock */}
+              <div className="absolute top-0 left-1/2 -translate-x-1/2 w-32 h-20 bg-amber-500/10 rounded-full blur-2xl pointer-events-none" />
+
+              <div className="text-center mb-8 flex flex-col items-center">
+                <div className="w-12 h-12 rounded-xl border border-amber-500/20 bg-amber-500/5 flex items-center justify-center mb-4">
+                  <Lock className="w-5 h-5 text-amber-500 animate-pulse" />
+                </div>
+                <h1 className="font-orbitron font-extrabold text-lg text-white uppercase tracking-widest">
+                  MAINFRAME LOCK
+                </h1>
+                <p className="font-space text-[10px] text-slate-500 mt-1.5 tracking-widest uppercase">
+                  Champions Admin portal authorization
+                </p>
               </div>
 
-              {/* Password */}
-              <div className="space-y-2">
-                <label className="text-slate-400 font-bold uppercase tracking-wider block text-[9px]">CONSOLE PASSCODE ACCESS</label>
-                <input 
-                  type="password" 
-                  required
-                  placeholder="••••••••"
-                  value={loginPassword}
-                  onChange={(e) => setLoginPassword(e.target.value)}
-                  className="w-full bg-slate-900 border border-white/5 focus:border-amber-400/40 rounded-xl px-4 py-3 text-white focus:outline-hidden"
-                />
-              </div>
+              <form onSubmit={handleLoginSubmit} className="space-y-5 font-space text-xs">
+                
+                {/* Email */}
+                <div className="space-y-2">
+                  <label className="text-slate-400 font-bold uppercase tracking-wider block text-[9px]">CONSOLE SECURE USERNAME</label>
+                  <input 
+                    type="email" 
+                    required
+                    placeholder="admin@champions.com"
+                    value={loginEmail}
+                    onChange={(e) => setLoginEmail(e.target.value)}
+                    className="w-full bg-slate-900 border border-white/5 focus:border-amber-400/40 rounded-xl px-4 py-3 text-white focus:outline-hidden placeholder-slate-600"
+                  />
+                </div>
 
-              <div className="pt-2">
-                <button
-                  type="submit"
-                  disabled={authLoading}
-                  className="w-full flex items-center justify-center space-x-2 px-4 py-3 bg-linear-to-r from-amber-500 to-orange-500 hover:shadow-lg hover:shadow-orange-500/10 text-slate-950 font-orbitron font-black text-xs uppercase tracking-widest rounded-xl transition-all duration-300 cursor-pointer shadow-md"
-                >
-                  {authLoading ? (
-                    <>
-                      <Loader2 className="w-4.5 h-4.5 animate-spin text-slate-950" />
-                      <span>DECRYPTING KEYS...</span>
-                    </>
-                  ) : (
-                    <>
-                      <Sparkles className="w-4.5 h-4.5 text-slate-950" />
-                      <span>SECURE LOG IN</span>
-                    </>
-                  )}
-                </button>
-              </div>
+                {/* Password */}
+                <div className="space-y-2">
+                  <label className="text-slate-400 font-bold uppercase tracking-wider block text-[9px]">CONSOLE PASSCODE ACCESS</label>
+                  <input 
+                    type="password" 
+                    required
+                    placeholder="••••••••"
+                    value={loginPassword}
+                    onChange={(e) => setLoginPassword(e.target.value)}
+                    className="w-full bg-slate-900 border border-white/5 focus:border-amber-400/40 rounded-xl px-4 py-3 text-white focus:outline-hidden"
+                  />
+                </div>
 
-              {/* Graceful tip warning */}
-              <div className="p-3 bg-slate-900/50 border border-white/5 rounded-xl text-slate-500 text-[10px] leading-relaxed text-center">
-                Local offline access: Use <code className="text-amber-500 font-bold">admin@champions.com</code> with passcode <code className="text-amber-500 font-bold">champions</code>.
-              </div>
+                <div className="pt-2">
+                  <button
+                    type="submit"
+                    disabled={authLoading}
+                    className="w-full flex items-center justify-center space-x-2 px-4 py-3 bg-linear-to-r from-amber-500 to-orange-500 hover:shadow-lg hover:shadow-orange-500/10 text-slate-950 font-orbitron font-black text-xs uppercase tracking-widest rounded-xl transition-all duration-300 cursor-pointer shadow-md"
+                  >
+                    {authLoading ? (
+                      <>
+                        <Loader2 className="w-4.5 h-4.5 animate-spin text-slate-950" />
+                        <span>DECRYPTING KEYS...</span>
+                      </>
+                    ) : (
+                      <>
+                        <Sparkles className="w-4.5 h-4.5 text-slate-950" />
+                        <span>SECURE LOG IN</span>
+                      </>
+                    )}
+                  </button>
+                </div>
 
-            </form>
+                {/* Graceful tip warning */}
+                <div className="p-3 bg-slate-900/50 border border-white/5 rounded-xl text-slate-500 text-[10px] leading-relaxed text-center">
+                  Local offline access: Use <code className="text-amber-500 font-bold">admin@champions.com</code> with passcode <code className="text-amber-500 font-bold">champions</code>.
+                </div>
+
+              </form>
+            </div>
           </div>
-        </div>
+          <FloatingCallButton />
+        </>
       );
     }
 
     return (
-      <AdminDashboard 
-        products={products}
-        offers={offers}
-        orders={orders}
-        onRefreshProducts={fetchProducts}
-        onRefreshOffers={fetchOffers}
-        onRefreshOrders={fetchOrders}
-        onLogout={handleLogout}
-        userEmail={adminEmail}
-      />
+      <>
+        <AdminDashboard 
+          products={products}
+          offers={offers}
+          orders={orders}
+          onRefreshProducts={fetchProducts}
+          onRefreshOffers={fetchOffers}
+          onRefreshOrders={fetchOrders}
+          onLogout={handleLogout}
+          userEmail={adminEmail}
+        />
+        <FloatingCallButton />
+      </>
     );
   }
 
@@ -682,6 +714,7 @@ function App() {
 
       {/* Cybernetic Footer */}
       <Footer />
+      <FloatingCallButton />
     </div>
   );
 }
